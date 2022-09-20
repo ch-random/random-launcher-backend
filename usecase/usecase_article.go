@@ -58,7 +58,9 @@ func (au *articleUsecase) fillUserDetails(c context.Context, data []domain.Artic
 	}
 	// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
 	go func() {
-		eg.Wait()
+		if err := eg.Wait(); err != nil {
+			log.Println("err:", err)
+		}
 		close(chanUser)
 	}()
 

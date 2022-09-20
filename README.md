@@ -1,6 +1,6 @@
-[![Actions Status](https://github.com/ch-random/random-launcher/workflows/ci/badge.svg)](https://github.com/ch-random/random-launcher/actions/workflows/ci.yml)
-[![go-version](https://img.shields.io/github/go-mod/go-version/ch-random/random-launcher-backend)](https://github.com/ch-random/random-launcher/blob/master/go.mod)
-[![license](https://img.shields.io/badge/license-CC0--1.0-blue)](https://github.com/ch-random/random-launcher/blob/master/LICENSE)
+[![Actions Status](https://github.com/ch-random/random-launcher-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/ch-random/random-launcher-backend/actions/workflows/ci.yml)
+[![go-version](https://img.shields.io/github/go-mod/go-version/ch-random/random-launcher-backend)](https://github.com/ch-random/random-launcher-backend/blob/master/go.mod)
+[![license](https://img.shields.io/badge/license-CC0--1.0-blue)](https://github.com/ch-random/random-launcher-backend/blob/master/LICENSE)
 
 # random-launcher-backend
 
