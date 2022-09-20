@@ -40,7 +40,7 @@ jobs:
 
           echo "Running go vet shadow..."
           goshadow_path="$(dirname "$0")/goshadow.sh"
-          chmod 700 $goshadow_path
           echo $goshadow_path
           echo 'go run golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest "$@"' > $goshadow_path
+          chmod 700 $goshadow_path
           go vet -vettool=$goshadow_path ./...
