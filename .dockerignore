@@ -7,5 +7,6 @@
 *.py
 .env
 dbdiagram.md
+# go.sum
 memo.md
 random-launcher-backend
