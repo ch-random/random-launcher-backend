@@ -35,9 +35,10 @@ jobs:
           go vet -all -composites=false -unreachable=false -tests=false ./...
 
           echo "Running go vet shadow..."
-          echo 'go run golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest "$@"' > goshadow.sh
-          dirname "$0"
-          go vet -vettool="$(dirname "$0")/goshadow.sh" ./...
+          goshadow_path="$(dirname "$0")/goshadow.sh"
+          echo $goshadow_path
+          echo 'go run golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest "$@"' > $goshadow_path
+          go vet -vettool=$goshadow_path ./...
 
       # https://github.com/golangci/golangci-lint-action
       - name: golangci-lint
