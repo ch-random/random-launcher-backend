@@ -1,0 +1,11 @@
+/.vscode
+
+*.Identifier
+*.py
+*.sh
+.env
+dbdiagram.md
+go.sum
+memo.md
+random-launcher-backend
+test.sql
