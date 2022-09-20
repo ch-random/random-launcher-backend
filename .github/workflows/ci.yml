@@ -3,10 +3,8 @@ name: CI
 on:
   push:
     branches: [master]
-    paths: ['**.go', 'go.mod', '.github/workflows/ci.yml']
   pull_request:
     branches: [master]
-    paths: ['**.go', 'go.mod', '.github/workflows/ci.yml']
 
 jobs:
   build:
@@ -28,6 +26,12 @@ jobs:
           git diff --exit-code -- go.sum || (echo "`go.sum` is dirty, update the file with `go mod tidy` locally." && exit 1)
           go mod verify || (echo "One or more Go dependencies failed verification." && exit 1)
 
+      # https://github.com/golangci/golangci-lint-action
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
       # https://github.com/stellar/go/blob/master/govet.sh
       - name: Run `go vet`
         run: |
@@ -35,13 +39,8 @@ jobs:
           go vet -all -composites=false -unreachable=false -tests=false ./...
 
           echo "Running go vet shadow..."
-          goshadow_path="goshadow.sh"
+          goshadow_path="$(dirname "$0")/goshadow.sh"
+          chmod 700 $goshadow_path
           echo $goshadow_path
           echo 'go run golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest "$@"' > $goshadow_path
           go vet -vettool=$goshadow_path ./...
-
-      # https://github.com/golangci/golangci-lint-action
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
