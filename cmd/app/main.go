@@ -8,7 +8,8 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go"
-	"github.com/ch-random/random-launcher-backend/configs"
+	"github.com/ch-random/random-launcher-backend/cmd"
+	"github.com/ch-random/random-launcher-backend/config"
 	"github.com/ch-random/random-launcher-backend/delivery/httpserver"
 	"github.com/ch-random/random-launcher-backend/repository/pscale"
 	"github.com/ch-random/random-launcher-backend/usecase"
@@ -16,6 +17,10 @@ import (
 )
 
 func main() {
+	if err := cmd.Init(); err != nil {
+		log.Println(err)
+	}
+
 	// Load environment variables from `.env`
 	if err := godotenv.Load(); err != nil {
 		log.Println("failed to load environment variables:", err)
@@ -23,20 +28,38 @@ func main() {
 
 	_, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
-		log.Println("connection to Firebase failed:", err)
+		log.Println("failed to connect to Firebase:", err)
 	}
 
-	db := pscale.GetDB()
+	db, err := pscale.GetDB()
+	if err != nil {
+		log.Fatalln("failed to connect to PlanetScale:", err)
+	}
 
-	articleRepo := pscale.NewPscaleArticleRepository(db)
-	userRepo := pscale.NewPscaleUserRepository(db)
-	au := usecase.NewArticleUsecase(articleRepo, userRepo, configs.TIMEOUT)
+	ur := pscale.NewUserRepository(db)
+	ar := pscale.NewArticleRepository(db)
+	agc := pscale.NewArticleGameContentRepository(db)
+	aor := pscale.NewArticleOwnerRepository(db)
+	atr := pscale.NewArticleTagRepository(db)
+	acr := pscale.NewArticleCommentRepository(db)
+	aiur := pscale.NewArticleImageURLRepository(db)
+	timeout := config.Timeout
+	au := usecase.NewArticleUsecase(
+		ur,
+		ar,
+		agc,
+		aor,
+		atr,
+		acr,
+		aiur,
+		timeout,
+	)
 
-	e := httpserver.NewArticleHandler(db, au)
+	e := httpserver.NewHandler(db, au)
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = configs.PORT
+		port = config.Port
 	}
 	log.Println("listening on", port)
 	addr := ":" + port

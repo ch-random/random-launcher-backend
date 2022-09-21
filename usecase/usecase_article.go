@@ -6,109 +6,163 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+	"github.com/google/uuid"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 )
 
 type articleUsecase struct {
-	articleRepo domain.ArticleRepository
-	userRepo    domain.UserRepository
-	timeout     time.Duration
+	ur      domain.UserRepository
+	ar      domain.ArticleRepository
+	agcr    domain.ArticleGameContentRepository
+	aor     domain.ArticleOwnerRepository
+	atr     domain.ArticleTagRepository
+	acr     domain.ArticleCommentRepository
+	aiur    domain.ArticleImageURLRepository
+	timeout time.Duration
 }
 
-func NewArticleUsecase(articleRepo domain.ArticleRepository, userRepo domain.UserRepository, timeout time.Duration) domain.ArticleUsecase {
+func NewArticleUsecase(
+	ur domain.UserRepository,
+	ar domain.ArticleRepository,
+	agcr domain.ArticleGameContentRepository,
+	aor domain.ArticleOwnerRepository,
+	atr domain.ArticleTagRepository,
+	acr domain.ArticleCommentRepository,
+	aiur domain.ArticleImageURLRepository,
+	timeout time.Duration,
+) domain.ArticleUsecase {
 	return &articleUsecase{
-		articleRepo,
-		userRepo,
+		ur,
+		ar,
+		agcr,
+		aor,
+		atr,
+		acr,
+		aiur,
 		timeout,
 	}
 }
 
-func (au *articleUsecase) fillUserDetails(c context.Context, data []domain.Article) ([]domain.Article, error) {
-	eg, ctx := errgroup.WithContext(c)
+func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Article) ([]domain.Article, error) {
+	ctx, cancel := context.WithTimeout(c, au.timeout)
+	defer cancel()
+	eg, _ := errgroup.WithContext(ctx)
 
-	// Get the user's id
-	mapUsers := map[uint]domain.User{}
-
-	for _, article := range data {
-		mapUsers[article.UserID] = domain.User{}
-		log.Println("article:", article)
+	// ars[i].ArticleOwner.User
+	// aosList <- ars
+	aosList := map[uuid.UUID][]domain.ArticleOwner{}
+	for _, ar := range ars {
+		aosList[ar.ID] = []domain.ArticleOwner{}
 	}
+	chArticleOwners := make(chan []domain.ArticleOwner)
 
-	// Using goroutine to fetch the user's detail
-	chanUser := make(chan domain.User)
-	for userID := range mapUsers {
-		userID := userID
-		log.Println("userID:", userID)
-		// 複数のGoroutineをWaitGroup（ErrGroup）で制御する
-		// https://blog.toshimaru.net/goroutine-with-waitgroup/
-		eg.Go(func() (err error) {
-			user, err := au.userRepo.GetByID(userID)
+	// chArticleOwners <- aosList
+	eg.Go(func() (err error) {
+		defer close(chArticleOwners)
+		for articleID := range aosList {
+			// articleID := articleID
+			aos, err := au.aor.GetByArticleID(articleID)
 			if err != nil {
-				return
+				return err
 			}
-			select {
-			case chanUser <- user:
-				return
-			case <-ctx.Done():
-				log.Println("the gorutine canceled. userID:", userID)
-				return ctx.Err()
+			for i, ao := range aos {
+				aos[i].User, err = au.ur.GetByID(ao.ID)
+				if err != nil {
+					return err
+				}
 			}
-		})
-	}
-	// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
+			chArticleOwners <- aos
+		}
+		return
+	})
 	go func() {
+		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
 		if err := eg.Wait(); err != nil {
 			log.Println("err:", err)
 		}
-		close(chanUser)
 	}()
 
-	for user := range chanUser {
-		if user != (domain.User{}) {
-			mapUsers[user.ID] = user
+	// aosList <- chArticleOwners
+	for aos := range chArticleOwners {
+		aosList[aos[0].ArticleID] = aos
+	}
+
+	// ars[i].ArticleOwners <- aosList
+	for i, ar := range ars {
+		aos, ok := aosList[ar.ID]
+		ars[i].ArticleOwners = aos
+		if !ok {
+			log.Printf("error: aosList[%d] is invalid", ar.ID)
 		}
 	}
 
-	// merge the user's data
-	for index, item := range data {
-		if au, ok := mapUsers[item.User.ID]; ok {
-			data[index].User = au
-		}
+	// Check whether any of the goroutines failed
+	if err := eg.Wait(); err != nil {
+		return []domain.Article{}, nil
 	}
-	return data, nil
+	return ars, nil
 }
-
-func (au *articleUsecase) Fetch(c context.Context, cursor string, numString string) (res []domain.Article, nextCursor string, err error) {
+func (au *articleUsecase) Fetch(c context.Context, cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
 	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
 
-	res, nextCursor, err = au.articleRepo.Fetch(cursor, numString)
+	ars, nextCursor, err = au.ar.Fetch(cursor, numString)
 	if err != nil {
 		return nil, "", err
 	}
 
-	res, err = au.fillUserDetails(ctx, res)
+	ars, err = au.fillArticlesDetail(ctx, ars)
 	if err != nil {
 		nextCursor = ""
 	}
 	return
 }
 
-func (au *articleUsecase) GetByID(c context.Context, id uint) (res domain.Article, err error) {
-	_, cancel := context.WithTimeout(c, au.timeout)
+func (au *articleUsecase) fillArticleDetail(c context.Context, ar domain.Article) (domain.Article, error) {
+	ctx, cancel := context.WithTimeout(c, au.timeout)
+	defer cancel()
+	eg, _ := errgroup.WithContext(ctx)
+
+	chArticleOwners := make(chan []domain.ArticleOwner)
+
+	eg.Go(func() (err error) {
+		defer close(chArticleOwners)
+		aos := ar.ArticleOwners
+		for _, ao := range aos {
+			ao.User, err = au.ur.GetByID(ao.ID)
+			if err != nil {
+				return
+			}
+		}
+		chArticleOwners <- aos
+		return
+	})
+	go func() {
+		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
+		if err := eg.Wait(); err != nil {
+			log.Println("err:", err)
+		}
+	}()
+
+	ar.ArticleOwners = <-chArticleOwners
+
+	// Check whether any of the goroutines failed
+	if err := eg.Wait(); err != nil {
+		return domain.Article{}, nil
+	}
+	return ar, nil
+}
+func (au *articleUsecase) GetByID(c context.Context, id uuid.UUID) (ar domain.Article, err error) {
+	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
 
-	res, err = au.articleRepo.GetByID(id)
-	if err != nil {
-		return
-	}
-
-	resUser, err := au.userRepo.GetByID(res.UserID)
+	ar, err = au.ar.GetByID(id)
 	if err != nil {
 		return domain.Article{}, err
 	}
-	res.User = resUser
+
+	ar, err = au.fillArticleDetail(ctx, ar)
 	return
 }
 
@@ -117,42 +171,36 @@ func (au *articleUsecase) Update(c context.Context, ar *domain.Article) error {
 	defer cancel()
 
 	ar.UpdatedAt = time.Now()
-	return au.articleRepo.Update(ar)
+	return au.ar.Update(ar)
 }
 
-func (au *articleUsecase) GetByTitle(c context.Context, title string) (res domain.Article, err error) {
-	_, cancel := context.WithTimeout(c, au.timeout)
+func (au *articleUsecase) GetByTitle(c context.Context, title string) (ar domain.Article, err error) {
+	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
-	res, err = au.articleRepo.GetByTitle(title)
+
+	ar, err = au.ar.GetByTitle(title)
 	if err != nil {
 		return domain.Article{}, err
 	}
 
-	resUser, err := au.userRepo.GetByID(res.User.ID)
-	if err != nil {
-		return domain.Article{}, err
-	}
-
-	res.User = resUser
+	ar, err = au.fillArticleDetail(ctx, ar)
 	return
 }
 
-func (au *articleUsecase) Insert(c context.Context, m *domain.Article) (err error) {
+func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err error) {
 	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
-	_, err = au.GetByTitle(ctx, m.Title)
-	if err != nil {
+	if _, err = au.GetByTitle(ctx, ar.Title); err != nil {
 		return err
 	}
-	return au.articleRepo.Insert(m)
+	return au.ar.Insert(ar)
 }
 
-func (au *articleUsecase) Delete(c context.Context, id uint) (err error) {
+func (au *articleUsecase) Delete(c context.Context, id uuid.UUID) (err error) {
 	_, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
-	_, err = au.articleRepo.GetByID(id)
-	if err != nil {
+	if _, err = au.ar.GetByID(id); err != nil {
 		return err
 	}
-	return au.articleRepo.Delete(id)
+	return au.ar.Delete(id)
 }

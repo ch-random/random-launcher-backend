@@ -1,3 +1,4 @@
+-- users
 DESCRIBE users;
 
 INSERT INTO
@@ -10,6 +11,7 @@ SELECT
 FROM
   users;
 
+-- articles
 DESCRIBE articles;
 
 INSERT INTO
@@ -19,7 +21,7 @@ VALUES
     1,
     'Vue + TailwindCSS Hands-on',
     '# Intro ...',
-(TRUE)
+    (TRUE)
   );
 
 SELECT
@@ -27,6 +29,24 @@ SELECT
 FROM
   articles;
 
+-- article_game_contents
+DESCRIBE article_game_contents;
+
+INSERT INTO
+  `article_game_contents` (id, exec_path, zip_url)
+VALUES
+  (
+    1,
+    'Neatly.exe',
+    'https://drive.google.com/uc?export=download&id=1Sn08keQU9eSbGDvYja8_PhBPiegJ99V_'
+  );
+
+SELECT
+  *
+FROM
+  article_game_contents;
+
+-- article_owners
 DESCRIBE article_owners;
 
 INSERT INTO
@@ -39,6 +59,7 @@ SELECT
 FROM
   article_owners;
 
+-- article_tags
 DESCRIBE article_tags;
 
 INSERT INTO
@@ -51,6 +72,7 @@ SELECT
 FROM
   article_tags;
 
+-- article_comments
 DESCRIBE article_comments;
 
 INSERT INTO
@@ -68,6 +90,7 @@ SELECT
 FROM
   article_comments;
 
+-- article_image_urls
 DESCRIBE article_image_urls;
 
 INSERT INTO

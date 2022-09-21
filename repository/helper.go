@@ -7,10 +7,10 @@ import (
 )
 
 // t := time.Now()
-// log.Println("current time:", t.Format(TIME_LAYOUT))
+// log.Println("current time:", t.Format(timeLayout))
 const (
 	// 2006-01-02T15:04:05.999999999Z07:00
-	TIME_LAYOUT = time.RFC3339Nano
+	timeLayout = time.RFC3339Nano
 )
 
 // DecodeCursor will decode cursor from user for mysql
@@ -27,12 +27,12 @@ func DecodeCursor(encodedTime string) (t time.Time, err error) {
 	}
 
 	timeString := string(timeByte)
-	t, err = time.Parse(TIME_LAYOUT, timeString)
+	t, err = time.Parse(timeLayout, timeString)
 	return
 }
 
 // EncodeCursor will encode cursor from mysql to user
 func EncodeCursor(t time.Time) string {
-	timeString := t.Format(TIME_LAYOUT)
+	timeString := t.Format(timeLayout)
 	return base64.StdEncoding.EncodeToString([]byte(timeString))
 }

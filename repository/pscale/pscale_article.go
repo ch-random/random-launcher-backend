@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"github.com/google/uuid"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 	"github.com/ch-random/random-launcher-backend/repository"
@@ -14,14 +16,11 @@ type pscaleArticleRepository struct {
 	db *gorm.DB
 }
 
-// NewPscaleArticleRepository will create an object that represent the article.Repository interface
-func NewPscaleArticleRepository(db *gorm.DB) domain.ArticleRepository {
-	return &pscaleArticleRepository{db}
+func NewArticleRepository(db *gorm.DB) domain.ArticleRepository {
+	return &pscaleArticleRepository{db.Model(&domain.Article{})}
 }
 
-func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString string) (articles []domain.Article, nextCursor string, err error) {
-	// query := `SELECT id, title, content, user_id, updated_at, created_at
-	// FROM article WHERE created_at > ? ORDER BY created_at LIMIT ?`
+func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
 	log.Println("cursor:", cursor)
 	db := articleRepo.db
 
@@ -38,65 +37,70 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 
 	num, err := strconv.Atoi(numString)
 	if err == nil {
-		db = db.Limit(num);
+		db = db.Limit(num)
 	}
 
-	if err = db.Find(&articles).Error; err != nil {
+	// Preloading (Eager Loading) https://gorm.io/ja_JP/docs/preload.html
+	// Join Preload は、one-to-one (has one, belongs to) でのみ動作します。
+	// Preloading https://qiita.com/tsubasaozawa/items/ac5a8a515fe4f7a139b0
+	// Nested Preloading: db.Preload("ArticleOwner.User")
+	// db.Preload(clause.Associations) により全データを preload できる。
+	// 不要データを含むなら、db.Preload(""), `gorm:"PRELOAD:false"` として高速化。
+	db = db.Preload(clause.Associations).Begin().Find(&ars)
+	if err = db.Error; err != nil {
 		return
 	}
+	log.Println("ars:", ars)
 
-	if len(articles) == int(num) {
-		nextCursor = repository.EncodeCursor(articles[len(articles)-1].CreatedAt)
+	if len(ars) == int(num) {
+		nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
 	}
 	return
 }
-func (articleRepo *pscaleArticleRepository) GetByID(id uint) (article domain.Article, err error) {
-	// query := `SELECT id, title, content, user_id, updated_at, created_at
-	// FROM article WHERE ID = ?`
-	if result := articleRepo.db.Where("id = ?", id).First(&article); result.Error != nil {
+func (articleRepo *pscaleArticleRepository) GetByID(id uuid.UUID) (ar domain.Article, err error) {
+	db := articleRepo.db.Where("id = ?", id).Preload(clause.Associations).Begin().First(&ar)
+	if db.Error != nil {
 		err = domain.ErrNotFound
 	}
 	return
 }
 
-func (articleRepo *pscaleArticleRepository) GetByTitle(title string) (article domain.Article, err error) {
-	// query := `SELECT id, title, content, user_id, updated_at, created_at
-	// FROM article WHERE title = ?`
-	if result := articleRepo.db.Where("title = ?", title).First(&article); result.Error != nil {
+func (articleRepo *pscaleArticleRepository) GetByTitle(title string) (ar domain.Article, err error) {
+	db := articleRepo.db.Where("title = ?", title).Preload(clause.Associations).Begin().First(&ar)
+	if db.Error != nil {
 		err = domain.ErrNotFound
 	}
 	return
 }
 
-func (articleRepo *pscaleArticleRepository) Insert(a *domain.Article) (err error) {
-	// query := "INSERT article SET title=?, content=?, user_id=?, updated_at=?, created_at=?"
-	err = articleRepo.db.Create(a).Error;
+func (articleRepo *pscaleArticleRepository) Insert(ar *domain.Article) (err error) {
+	db := articleRepo.db.Create(ar)
+	if err = db.Error; err != nil {
+		db.Rollback()
+		return
+	}
 	return
 }
 
-func (articleRepo *pscaleArticleRepository) Update(a *domain.Article) (err error) {
-	// query := "UPDATE article set title=?, content=?, user_id=?, updated_at=? WHERE id = ?"
-	result := articleRepo.db.Updates(a);
-	if err = result.Error; err != nil {
+func (articleRepo *pscaleArticleRepository) Update(ar *domain.Article) (err error) {
+	db := articleRepo.db.Where("id = ?", ar.ID).Updates(ar)
+	if err = db.Error; err != nil {
 		return
 	}
 
-	affected := result.RowsAffected
-	if affected != 1 {
+	if affected := db.RowsAffected; affected != 1 {
 		err = domain.ErrRowsAffectedNotOne
 	}
 	return
 }
 
-func (articleRepo *pscaleArticleRepository) Delete(id uint) (err error) {
-	// query := "DELETE FROM article WHERE id = ?"
-	result := articleRepo.db.Where("id = ?", id).Delete(&domain.Article{});
-	if err = result.Error; err != nil {
+func (articleRepo *pscaleArticleRepository) Delete(id uuid.UUID) (err error) {
+	db := articleRepo.db.Where("id = ?", id).Delete(&domain.Article{})
+	if err = db.Error; err != nil {
 		return
 	}
 
-	affected := result.RowsAffected
-	if affected != 1 {
+	if affected := db.RowsAffected; affected != 1 {
 		err = domain.ErrRowsAffectedNotOne
 	}
 	return

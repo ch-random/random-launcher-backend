@@ -34,13 +34,4 @@ jobs:
 
       # https://github.com/stellar/go/blob/master/govet.sh
       - name: Run `go vet`
-        run: |
-          echo "Running go vet..."
-          go vet -all -composites=false -unreachable=false -tests=false ./...
-
-          echo "Running go vet shadow..."
-          goshadow_path="$(dirname "$0")/goshadow.sh"
-          echo $goshadow_path
-          echo 'go run golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest "$@"' > $goshadow_path
-          chmod 700 $goshadow_path
-          go vet -vettool=$goshadow_path ./...
+        run: go vet -all -composites=false -unreachable=false -tests=false ./...
