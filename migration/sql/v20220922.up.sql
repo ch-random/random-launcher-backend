@@ -13,59 +13,59 @@ DROP TABLE IF EXISTS `article_comments`;
 DROP TABLE IF EXISTS `article_image_urls`;
 
 CREATE TABLE `users` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `created_at` DATETIME DEFAULT NOW(),
-  `updated_at` DATETIME DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
-  `google_id` varchar(255) UNIQUE NOT NULL,
-  `role` varchar(255),
-  `name` varchar(255)
+  `id` char(36) PRIMARY KEY,
+  `created_at` DATETIME(6) DEFAULT NOW(),
+  `updated_at` DATETIME(6) DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+  `google_id` text NOT NULL,
+  `role` text,
+  `name` text
 );
 
 CREATE TABLE `articles` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `created_at` DATETIME DEFAULT NOW(),
-  `updated_at` DATETIME DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
-  `user_id` int,
-  `title` varchar(255),
-  `body` varchar(255),
+  `id` char(36) PRIMARY KEY,
+  `created_at` DATETIME(6) DEFAULT NOW(),
+  `updated_at` DATETIME(6) DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+  `user_id` char(36),
+  `title` text,
+  `body` text,
   `public` bool
 );
 
 CREATE TABLE `article_game_contents` (
-  `id` int PRIMARY KEY,
-  `created_at` DATETIME DEFAULT NOW(),
-  `updated_at` DATETIME DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
-  `exec_path` varchar(255),
-  `zip_url` varchar(255)
+  `id` char(36) PRIMARY KEY,
+  `created_at` DATETIME(6) DEFAULT NOW(),
+  `updated_at` DATETIME(6) DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+  `exec_path` text,
+  `zip_url` text
 );
 
 CREATE TABLE `article_owners` (
-  `id` int,
-  `article_id` int,
+  `id` char(36),
+  `article_id` char(36),
   PRIMARY KEY (`id`, `article_id`)
 );
 
 CREATE TABLE `article_tags` (
-  `id` int AUTO_INCREMENT,
-  `article_id` int,
-  `name` varchar(255),
+  `id` char(36) AUTO_INCREMENT,
+  `article_id` char(36),
+  `name` text,
   PRIMARY KEY (`id`, `article_id`)
 );
 
 CREATE TABLE `article_comments` (
-  `id` int AUTO_INCREMENT,
-  `created_at` DATETIME DEFAULT NOW(),
-  `updated_at` DATETIME DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
-  `article_id` int,
-  `body` varchar(255),
+  `id` char(36) AUTO_INCREMENT,
+  `created_at` DATETIME(6) DEFAULT NOW(),
+  `updated_at` DATETIME(6) DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+  `article_id` char(36),
+  `body` text,
   `rate` int,
   PRIMARY KEY (`id`, `article_id`)
 );
 
 CREATE TABLE `article_image_urls` (
-  `id` int AUTO_INCREMENT,
-  `article_id` int,
-  `image_url` varchar(255),
+  `id` char(36) AUTO_INCREMENT,
+  `article_id` char(36),
+  `image_url` text,
   PRIMARY KEY (`id`, `article_id`)
 );
 

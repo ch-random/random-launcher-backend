@@ -22,8 +22,8 @@ jobs:
       - name: Run `go mod tidy`
         run: |
           go mod tidy
-          git diff --exit-code -- go.mod || (echo "`go.mod` is dirty, update the file with `go mod tidy` locally." && exit 1)
-          git diff --exit-code -- go.sum || (echo "`go.sum` is dirty, update the file with `go mod tidy` locally." && exit 1)
+          git diff --exit-code -- go.mod || (echo '"go.mod" is dirty, update the file with "go mod tidy" locally.' && exit 1)
+          git diff --exit-code -- go.sum || (echo '"go.sum" is dirty, update the file with "go mod tidy" locally.' && exit 1)
           go mod verify || (echo "One or more Go dependencies failed verification." && exit 1)
 
       # https://github.com/golangci/golangci-lint-action

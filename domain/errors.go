@@ -1,10 +1,12 @@
-// labstack/echo Variables
-// https://pkg.go.dev/github.com/labstack/echo#pkg-variables
 package domain
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
+	// labstack/echo Variables
+	// https://pkg.go.dev/github.com/labstack/echo#pkg-variables
 	// Any Internal Server Error occurs
 	ErrInternalServerError = errors.New("internal server error")
 	// The requested item does not exist
@@ -14,6 +16,6 @@ var (
 	// The request-body is not valid
 	ErrBadRequestBodyInput = errors.New("given param is not valid")
 	// The param is not valid
-	ErrBadParamInput = errors.New("given param is not valid")
+	ErrBadParamInput      = errors.New("given param is not valid")
 	ErrRowsAffectedNotOne = errors.New("the number of affected rows is not 1")
 )

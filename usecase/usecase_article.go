@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"golang.org/x/sync/errgroup"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 )
@@ -79,7 +79,7 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 	go func() {
 		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
 		if err := eg.Wait(); err != nil {
-			log.Println("err:", err)
+			log.Err(err)
 		}
 	}()
 
@@ -93,7 +93,7 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 		aos, ok := aosList[ar.ID]
 		ars[i].ArticleOwners = aos
 		if !ok {
-			log.Printf("error: aosList[%d] is invalid", ar.ID)
+			log.Printf("warning: aosList[%d] is invalid", ar.ID)
 		}
 	}
 
@@ -141,7 +141,7 @@ func (au *articleUsecase) fillArticleDetail(c context.Context, ar domain.Article
 	go func() {
 		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
 		if err := eg.Wait(); err != nil {
-			log.Println("err:", err)
+			log.Err(err)
 		}
 	}()
 

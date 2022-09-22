@@ -1,10 +1,10 @@
 package httpserver
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 
 	"github.com/ch-random/random-launcher-backend/domain"
@@ -47,7 +47,7 @@ func getStatusCode(err error) int {
 		return http.StatusOK
 	}
 
-	log.Println(err)
+	log.Print(err)
 	switch err {
 	case domain.ErrInternalServerError:
 		return http.StatusInternalServerError

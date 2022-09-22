@@ -1,12 +1,12 @@
 package pscale
 
 import (
-	"log"
 	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 	"github.com/ch-random/random-launcher-backend/repository"
@@ -21,7 +21,7 @@ func NewArticleRepository(db *gorm.DB) domain.ArticleRepository {
 }
 
 func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
-	log.Println("cursor:", cursor)
+	log.Print("cursor: ", cursor)
 	db := articleRepo.db
 
 	if cursor != "" {
@@ -50,7 +50,7 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 	if err = db.Error; err != nil {
 		return
 	}
-	log.Println("ars:", ars)
+	log.Print("ars: ", ars)
 
 	if len(ars) == int(num) {
 		nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)

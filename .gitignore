@@ -1,4 +1,5 @@
 /.vscode
+/middleware/jwt
 /vendor
 
 *.Identifier

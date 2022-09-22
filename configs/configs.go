@@ -1,6 +1,8 @@
-package config
+package configs
 
-import "time"
+import (
+	"time"
+)
 
 const (
 	Port = "8080"

@@ -1,27 +1,57 @@
 package cmd
 
 import (
-	"log"
+	"errors"
+	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
-var RootCmd = &cobra.Command{
-    Use:   "launcher",
-    Short: "game launcher",
-    Run: func(cmd *cobra.Command, args []string) {
-        log.Println("root command")
-    },
-}
+const (
+	appName = "random-launcher-backend"
+	version = "v0.0.1"
+	about   = "backend for random-launcher"
+)
 
-func Init() (err error) {
-    cobra.OnInitialize()
-    RootCmd.AddCommand(
-        migrateCommand(),
-    )
-	if err = RootCmd.Execute(); err != nil {
-		log.Fatalln(os.Args[0], err)
+var (
+	short = fmt.Sprintf("%s %s", appName, version)
+	long  = fmt.Sprintf("%s\n%s", short, about)
+	errArgsProvided = errors.New("you should not provide any arguments")
+)
+
+func preRunE(cmd *cobra.Command, _args []string) (err error) {
+	log.Info().Msg(short)
+
+	// Load environment variables from `.env`
+	if err := godotenv.Load(); err != nil {
+		log.Warn().Err(err).Msg("failed to load environment variables")
 	}
 	return
+}
+
+func Execute() (err error) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	cobra.OnInitialize()
+	rootCmd := rootCommand()
+	rootCmd.AddCommand(
+		listCommand(),
+		migrateCommand(),
+	)
+	if err = rootCmd.Execute(); err != nil {
+		log.Fatal().Msg(err.Error())
+		return
+	}
+	return
+}
+
+func getEnvOrDefault(key string, def string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return def
+	}
+	return val
 }

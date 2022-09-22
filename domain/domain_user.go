@@ -7,12 +7,12 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid; primary_key" json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	GoogleID string `validate:"required" json:"googleId"`
-	Role     string `json:"role"`
-	Name     string `json:"name"`
+	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" validate:"required" json:"id"`
+	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
+	GoogleID  string    `gorm:"type:char(28);not null" validate:"required" json:"googleId"`
+	Role      string    `gorm:"type:text" json:"role"`
+	Name      string    `gorm:"type:text" json:"name"`
 }
 
 type UserRepository interface {

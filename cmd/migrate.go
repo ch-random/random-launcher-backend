@@ -2,39 +2,41 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/rs/zerolog/log"
 
-	"github.com/ch-random/random-launcher-backend/repository/pscale"
 	"github.com/ch-random/random-launcher-backend/migration"
+	"github.com/ch-random/random-launcher-backend/repository/pscale"
 )
 
-func migrateCommand() *cobra.Command {
-	var dropsDB bool
+var dropsDB bool
 
+func migrateCommand() *cobra.Command {
 	cmd := cobra.Command{
-		Use:   "migrate",
-		Short: "Execute database schema migration",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			engine, err := pscale.GetDB()
-			if err != nil {
-				return err
-			}
-			db, err := engine.DB()
-			if err != nil {
-				return err
-			}
-			defer db.Close()
-			if dropsDB {
-				if err := migration.DropAll(engine); err != nil {
-					return err
-				}
-			}
-			_, err = migration.Migrate(engine)
-			return err
-		},
+		Use:     "migrate",
+		Short:   "Execute database schema migration",
+		PreRunE: preRunE,
+		RunE:    migrateRunE,
+	}
+	flags := cmd.Flags()
+	flags.BoolVar(&dropsDB, "drop", false, "whether to truncate database (drop all tables)")
+	return &cmd
+}
+
+func migrateRunE(cmd *cobra.Command, args []string) (err error) {
+	if len(args) > 0 {
+		return errArgsProvided
 	}
 
-	flags := cmd.Flags()
-	flags.BoolVar(&dropsDB, "reset", false, "whether to truncate database (drop all tables)")
-
-	return &cmd
+	db, err := pscale.GetDB()
+	if err != nil {
+		return
+	}
+	if dropsDB {
+		if err = migration.DropAllTables(db); err != nil {
+			log.Warn().Err(err)
+			return
+		}
+	}
+	_, err = migration.Migrate(db)
+	return
 }

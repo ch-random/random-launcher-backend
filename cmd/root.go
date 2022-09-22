@@ -1,0 +1,74 @@
+// $ go run cmd/app/main.go
+package cmd
+
+import (
+	"context"
+
+	firebase "firebase.google.com/go"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
+
+	"github.com/ch-random/random-launcher-backend/configs"
+	"github.com/ch-random/random-launcher-backend/delivery/httpserver"
+	"github.com/ch-random/random-launcher-backend/repository/pscale"
+	"github.com/ch-random/random-launcher-backend/usecase"
+)
+
+func rootCommand() *cobra.Command {
+	var cmd = &cobra.Command{
+		Use:     appName,
+		Short:   short,
+		Long:    long,
+		Version: version,
+		PreRunE: preRunE,
+		RunE:    rootRunE,
+		// PostRunE,
+		// PersistentPostRunE,
+	}
+	return cmd
+}
+
+func rootRunE(cmd *cobra.Command, args []string) (err error) {
+	if len(args) > 0 {
+		return errArgsProvided
+	}
+
+	_, err = firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to connect to Firebase")
+	}
+
+	db, err := pscale.GetDB()
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to connect to PlanetScale")
+	}
+
+	ur := pscale.NewUserRepository(db)
+	ar := pscale.NewArticleRepository(db)
+	agc := pscale.NewArticleGameContentRepository(db)
+	aor := pscale.NewArticleOwnerRepository(db)
+	atr := pscale.NewArticleTagRepository(db)
+	acr := pscale.NewArticleCommentRepository(db)
+	aiur := pscale.NewArticleImageURLRepository(db)
+	timeout := configs.Timeout
+	au := usecase.NewArticleUsecase(
+		ur,
+		ar,
+		agc,
+		aor,
+		atr,
+		acr,
+		aiur,
+		timeout,
+	)
+
+	e := httpserver.NewHandler(db, au)
+
+	port := getEnvOrDefault("PORT", configs.Port)
+	log.Info().Msgf("listening on %s", port)
+	addr := ":" + port
+	if err := e.Start(addr); err != nil {
+		log.Warn().Err(err).Msg("failed to serve HTTP")
+	}
+	return
+}

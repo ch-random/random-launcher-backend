@@ -1,10 +1,16 @@
+-- github.com/google/uuid: 8-4-4-4-12
 -- users
 DESCRIBE users;
 
 INSERT INTO
-  `users` (google_id, role, name)
+  `users` (id, google_id, role, name)
 VALUES
-  ('LyC0r1s', 'user', 'Chisato');
+  (
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
+    "gidhrldl3o2t0afkj039eeu7xqj2",
+    "user",
+    "錦木 千束"
+  );
 
 SELECT
   *
@@ -15,12 +21,16 @@ FROM
 DESCRIBE articles;
 
 INSERT INTO
-  `articles` (user_id, title, body, public)
+  `articles` (id, user_id, title, body, public)
 VALUES
   (
-    1,
-    'Vue + TailwindCSS Hands-on',
-    '# Intro ...',
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
+    "uidp9zck-tz6h-ouz6-f4wj-o0k2kedvnv2q",
+    "Vue + TailwindCSS Hands-on",
+    '# Intro
+1. _
+2. _
+3. _',
     (TRUE)
   );
 
@@ -36,9 +46,9 @@ INSERT INTO
   `article_game_contents` (id, exec_path, zip_url)
 VALUES
   (
-    1,
-    'Neatly.exe',
-    'https://drive.google.com/uc?export=download&id=1Sn08keQU9eSbGDvYja8_PhBPiegJ99V_'
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
+    "Neatly.exe",
+    "https://drive.google.com/uc?export=download&id=1Sn08keQU9eSbGDvYja8_PhBPiegJ99V_"
   );
 
 SELECT
@@ -52,7 +62,10 @@ DESCRIBE article_owners;
 INSERT INTO
   `article_owners` (id, article_id)
 VALUES
-  (1, 1);
+  (
+    "uidp9zck-tz6h-ouz6-f4wj-o0k2kedvnv2q",
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5"
+  );
 
 SELECT
   *
@@ -65,7 +78,11 @@ DESCRIBE article_tags;
 INSERT INTO
   `article_tags` (id, article_id, name)
 VALUES
-  (1, 1, 'アクション');
+  (
+    "tidl674q-2nqi-wrwr-bc86-xt2rmxkq0s76",
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
+    "アクション"
+  );
 
 SELECT
   *
@@ -79,8 +96,8 @@ INSERT INTO
   `article_comments` (id, article_id, body, rate)
 VALUES
   (
-    1,
-    1,
+    "cidmo6ep-tjtw-utsb-y3so-8vwi1lw3d3sf",
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
     "What a fucking game! I'll never play it again!",
     1
   );
@@ -97,9 +114,9 @@ INSERT INTO
   `article_image_urls` (id, article_id, image_url)
 VALUES
   (
-    1,
-    1,
-    'https://www.famitsu.com/images/000/260/379/y_6274fb3411310.jpg'
+    "iuidczlt-t24m-pgx9-80es-r8sz1r26afa3",
+    "aid3x0lv-zotm-8kjg-z4bh-ovrq3khodmf5",
+    "https://www.famitsu.com/images/000/260/379/y_6274fb3411310.jpg"
   );
 
 SELECT

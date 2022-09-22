@@ -17,15 +17,15 @@ type Article struct {
 	// https://stackoverflow.com/questions/66810464/unsupported-relations-in-gorm
 	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
 	// `param:"id"`: c.Param("id")
-	ID        uuid.UUID      `gorm:"type:uuid; primary_key" param:"id" json:"Id"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body"`
-	Public    bool      `json:"public"`
+	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" validate:"required" param:"id" json:"Id"`
+	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
+	Title     string    `gorm:"type:text" json:"title"`
+	Body      string    `gorm:"type:text" json:"body"`
+	Public    bool      `gorm:"type:boolean" json:"public"`
 	// belongs to
-	UserID uuid.UUID `gorm:"type:uuid" json:"userId"`
-	User   User `json:"user"`
+	UserID uuid.UUID `gorm:"type:char(36);not null" validate:"required" json:"userId"`
+	User   User      `json:"user"`
 	// has one
 	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"articleGameContents"`
 	// has many

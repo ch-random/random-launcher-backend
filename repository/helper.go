@@ -2,8 +2,9 @@ package repository
 
 import (
 	"encoding/base64"
-	"log"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // t := time.Now()
@@ -17,7 +18,7 @@ const (
 func DecodeCursor(encodedTime string) (t time.Time, err error) {
 	if encodedTime == "" {
 		t = time.Now()
-		log.Println("t:", t)
+		log.Print("t: ", t)
 		return t, nil
 	}
 
