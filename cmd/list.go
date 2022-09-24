@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ch-random/random-launcher-backend/migration"
-	"github.com/ch-random/random-launcher-backend/utils"
 )
 
 func listCommand() *cobra.Command {
@@ -25,8 +24,8 @@ func listRunE(cmd *cobra.Command, args []string) (err error) {
 		return errArgsProvided
 	}
 
-	for _, v := range migration.Versions {
-		fmt.Println(utils.GetFuncName(v))
+	for _, v := range migration.GetVersions() {
+		fmt.Println(v)
 	}
 	return
 }

@@ -75,6 +75,7 @@ func (acu *articleCommentUsecase) Update(c context.Context, ac *domain.ArticleCo
 func (acu *articleCommentUsecase) Insert(c context.Context, ac *domain.ArticleComment) (err error) {
 	_, cancel := context.WithTimeout(c, acu.timeout)
 	defer cancel()
+
 	if err = acu.acr.Insert(ac); err != nil {
 		return err
 	}
@@ -84,6 +85,7 @@ func (acu *articleCommentUsecase) Insert(c context.Context, ac *domain.ArticleCo
 func (acu *articleCommentUsecase) Delete(c context.Context, id uuid.UUID) (err error) {
 	_, cancel := context.WithTimeout(c, acu.timeout)
 	defer cancel()
+
 	if _, err = acu.acr.GetByID(id); err != nil {
 		return err
 	}

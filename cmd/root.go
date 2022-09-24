@@ -10,8 +10,6 @@ import (
 
 	"github.com/ch-random/random-launcher-backend/configs"
 	"github.com/ch-random/random-launcher-backend/delivery/httpserver"
-	"github.com/ch-random/random-launcher-backend/repository/pscale"
-	"github.com/ch-random/random-launcher-backend/usecase"
 )
 
 func rootCommand() *cobra.Command {
@@ -38,31 +36,7 @@ func rootRunE(cmd *cobra.Command, args []string) (err error) {
 		log.Warn().Err(err).Msg("failed to connect to Firebase")
 	}
 
-	db, err := pscale.GetDB()
-	if err != nil {
-		log.Warn().Err(err).Msg("failed to connect to PlanetScale")
-	}
-
-	ur := pscale.NewUserRepository(db)
-	ar := pscale.NewArticleRepository(db)
-	agc := pscale.NewArticleGameContentRepository(db)
-	aor := pscale.NewArticleOwnerRepository(db)
-	atr := pscale.NewArticleTagRepository(db)
-	acr := pscale.NewArticleCommentRepository(db)
-	aiur := pscale.NewArticleImageURLRepository(db)
-	timeout := configs.Timeout
-	au := usecase.NewArticleUsecase(
-		ur,
-		ar,
-		agc,
-		aor,
-		atr,
-		acr,
-		aiur,
-		timeout,
-	)
-
-	e := httpserver.NewHandler(db, au)
+	e := httpserver.NewHandler()
 
 	port := getEnvOrDefault("PORT", configs.Port)
 	log.Info().Msgf("listening on %s", port)

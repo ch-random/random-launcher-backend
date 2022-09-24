@@ -5,9 +5,9 @@ import (
 )
 
 type ArticleImageURL struct {
-	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" validate:"required" json:"id"`
-	ArticleID uuid.UUID `gorm:"type:char(36);not null" validate:"required" json:"articleId"`
-	ImageURL  string    `gorm:"type:text" json:"imageUrl"`
+	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
+	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"articleId"`
+	ImageURL  string    `gorm:"type:text" validate:"required" json:"imageUrl"`
 }
 
 type ArticleImageURLRepository interface {

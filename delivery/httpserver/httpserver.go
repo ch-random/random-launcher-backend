@@ -5,23 +5,32 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 
+	"github.com/ch-random/random-launcher-backend/configs"
 	"github.com/ch-random/random-launcher-backend/domain"
+	"github.com/ch-random/random-launcher-backend/middleware/cors"
+	"github.com/ch-random/random-launcher-backend/migration"
+	"github.com/ch-random/random-launcher-backend/repository/pscale"
+	"github.com/ch-random/random-launcher-backend/usecase"
 )
 
 type ResponseError struct {
 	Message string `json:"message"`
+	Version string `json:"version"`
 }
 
 type HTTPHandler struct {
-	ArticleUsecase domain.ArticleUsecase
+	ArticleUsecase        domain.ArticleUsecase
 	ArticleCommentUsecase domain.ArticleCommentUsecase
 }
 
-func NewHandler(db *gorm.DB, articleUsecase domain.ArticleUsecase) *echo.Echo {
-	h := &HTTPHandler{ArticleUsecase: articleUsecase}
+func NewHandler() *echo.Echo {
 	e := echo.New()
+
+	corsHandler := cors.NewCORSHandler()
+	e.Use(corsHandler.HandleCORS)
+
+	h := &HTTPHandler{ArticleUsecase: newArticleUsecase()}
 
 	// /articles
 	e.GET("/articles", h.FetchArticles)
@@ -42,12 +51,47 @@ func NewHandler(db *gorm.DB, articleUsecase domain.ArticleUsecase) *echo.Echo {
 	return e
 }
 
+func newArticleUsecase() domain.ArticleUsecase {
+	db, err := pscale.GetDB()
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to connect to PlanetScale")
+	}
+
+	ur := pscale.NewUserRepository(db)
+	ar := pscale.NewArticleRepository(db)
+	agc := pscale.NewArticleGameContentRepository(db)
+	aor := pscale.NewArticleOwnerRepository(db)
+	atr := pscale.NewArticleTagRepository(db)
+	acr := pscale.NewArticleCommentRepository(db)
+	aiur := pscale.NewArticleImageURLRepository(db)
+	timeout := configs.Timeout
+	au := usecase.NewArticleUsecase(
+		ur,
+		ar,
+		agc,
+		aor,
+		atr,
+		acr,
+		aiur,
+		timeout,
+	)
+	return au
+}
+
+func getResponseError(err error) ResponseError {
+	vs := migration.GetVersions()
+	return ResponseError{
+		Message: err.Error(),
+		Version: vs[len(vs)-1],
+	}
+}
+
 func getStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
 
-	log.Print(err)
+	log.Info().Err(err).Msg("getStatusCode")
 	switch err {
 	case domain.ErrInternalServerError:
 		return http.StatusInternalServerError

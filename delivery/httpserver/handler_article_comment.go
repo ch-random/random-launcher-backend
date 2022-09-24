@@ -7,14 +7,14 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/ch-random/random-launcher-backend/domain"
+	"github.com/ch-random/random-launcher-backend/repository"
 )
 
 func articleCommentValid(ac *domain.ArticleComment) (bool, error) {
-	validate := validator.New()
-	if err := validate.Struct(ac); err != nil {
+	v := repository.NewValidator()
+	if err := v.Struct(ac); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -32,7 +32,7 @@ func (h *HTTPHandler) InsertArticleComment(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	if err := h.ArticleCommentUsecase.Insert(ctx, &ac); err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	return c.JSON(http.StatusCreated, ac)
 }

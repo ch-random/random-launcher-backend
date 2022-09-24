@@ -8,7 +8,7 @@ import (
 	"github.com/ch-random/random-launcher-backend/repository/pscale"
 )
 
-var dropsDB bool
+var drops bool
 
 func migrateCommand() *cobra.Command {
 	cmd := cobra.Command{
@@ -18,7 +18,7 @@ func migrateCommand() *cobra.Command {
 		RunE:    migrateRunE,
 	}
 	flags := cmd.Flags()
-	flags.BoolVar(&dropsDB, "drop", false, "whether to truncate database (drop all tables)")
+	flags.BoolVar(&drops, "drop", false, "whether to truncate database (drop all tables)")
 	return &cmd
 }
 
@@ -31,12 +31,16 @@ func migrateRunE(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	if dropsDB {
+
+	// drop all tables
+	if drops {
 		if err = migration.DropAllTables(db); err != nil {
 			log.Warn().Err(err)
 			return
 		}
 	}
+
+	// migrate
 	_, err = migration.Migrate(db)
 	return
 }

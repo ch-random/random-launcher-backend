@@ -8,27 +8,27 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
-	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/ch-random/random-launcher-backend/domain"
+	"github.com/ch-random/random-launcher-backend/repository"
 )
 
 func articleValid(ar *domain.Article) (bool, error) {
-	validate := validator.New()
-	if err := validate.Struct(ar); err != nil {
+	v := repository.NewValidator()
+	if err := v.Struct(ar); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
 func (h *HTTPHandler) FetchArticles(c echo.Context) error {
-	numString := c.QueryParam("num")
 	cursor := c.QueryParam("cursor")
+	numString := c.QueryParam("num")
 	ctx := c.Request().Context()
 
 	ars, nextCursor, err := h.ArticleUsecase.Fetch(ctx, cursor, numString)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, ars)
@@ -36,16 +36,16 @@ func (h *HTTPHandler) FetchArticles(c echo.Context) error {
 func (h *HTTPHandler) InsertArticle(c echo.Context) error {
 	var ar domain.Article
 	if err := c.Bind(&ar); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return c.JSON(http.StatusUnprocessableEntity, getResponseError(err))
 	}
 
 	if ok, err := articleValid(&ar); !ok {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, getResponseError(err))
 	}
 
 	ctx := c.Request().Context()
 	if err := h.ArticleUsecase.Insert(ctx, &ar); err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	return c.JSON(http.StatusCreated, ar)
 }
@@ -54,33 +54,34 @@ func (h *HTTPHandler) GetArticleByID(c echo.Context) error {
 	idString := c.Param("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, domain.ErrBadParamInput.Error())
+		return c.JSON(http.StatusBadRequest, getResponseError(domain.ErrBadParamInput))
 	}
 
 	ctx := c.Request().Context()
-	article, err := h.ArticleUsecase.GetByID(ctx, id)
+	ar, err := h.ArticleUsecase.GetByID(ctx, id)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
-	return c.JSON(http.StatusOK, article)
+	return c.JSON(http.StatusOK, ar)
 }
 func (h *HTTPHandler) UpdateArticle(c echo.Context) error {
-	idString := c.Param("id")
-	id, err := uuid.Parse(idString)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, domain.ErrBadParamInput.Error())
-	}
+	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
+	// idString := c.Param("id")
+	// id, err := uuid.Parse(idString)
+	// if err != nil {
+	// 	return c.JSON(http.StatusBadRequest, getResponseError(domain.ErrBadParamInput))
+	// }
 
 	var ar domain.Article
 	if err := c.Bind(&ar); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, domain.ErrBadRequestBodyInput.Error())
+		return c.JSON(http.StatusUnprocessableEntity, getResponseError(domain.ErrBadRequestBodyInput))
 	}
-	ar.ID = id
+	// ar.ID = id
 
 	ctx := c.Request().Context()
-	err = h.ArticleUsecase.Update(ctx, &ar)
+	err := h.ArticleUsecase.Update(ctx, &ar)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	return c.JSON(http.StatusOK, ar)
 }
@@ -88,12 +89,12 @@ func (h *HTTPHandler) DeleteArticle(c echo.Context) error {
 	idString := c.Param("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, domain.ErrBadParamInput.Error())
+		return c.JSON(http.StatusNotFound, getResponseError(domain.ErrBadParamInput))
 	}
 
 	ctx := c.Request().Context()
 	if err = h.ArticleUsecase.Delete(ctx, id); err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	return c.NoContent(http.StatusNoContent)
 }

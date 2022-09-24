@@ -21,11 +21,11 @@ func NewArticleRepository(db *gorm.DB) domain.ArticleRepository {
 }
 
 func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
-	log.Print("cursor: ", cursor)
 	db := articleRepo.db
 
 	if cursor != "" {
 		decodedCursor, err := repository.DecodeCursor(cursor)
+		log.Printf("decodedCursor: %v", decodedCursor)
 		if err != nil && cursor != "" {
 			return nil, "", domain.ErrBadParamInput
 		}
@@ -37,6 +37,7 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 
 	num, err := strconv.Atoi(numString)
 	if err == nil {
+		log.Printf("num: %v", num)
 		db = db.Limit(num)
 	}
 
@@ -50,9 +51,9 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 	if err = db.Error; err != nil {
 		return
 	}
-	log.Print("ars: ", ars)
+	log.Printf("ars: %v", ars)
 
-	if len(ars) == int(num) {
+	if len(ars) > 0 && len(ars) == num {
 		nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
 	}
 	return

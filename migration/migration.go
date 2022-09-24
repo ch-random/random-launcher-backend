@@ -12,7 +12,7 @@ import (
 const tableName = "migrations"
 
 var (
-	Versions = []func(*gorm.DB) error{
+	migrations = []func(*gorm.DB) error{
 		// version.VyyyyMMdd, // change log
 		version.V20220922, // 新規作成
 	}
@@ -29,13 +29,21 @@ var (
 	}
 )
 
+func GetVersions() []string {
+	var vs []string
+	for _, m := range migrations {
+		vs = append(vs, utils.GetFuncName(m))
+	}
+	return vs
+}
+
 // https://github.com/go-gormigrate/gormigrate
 func Migrate(db *gorm.DB) (inited bool, err error) {
 	var ms = []*gormigrate.Migration{}
-	for _, v := range Versions {
+	for _, m := range migrations {
 		ms = append(ms, &gormigrate.Migration{
-			ID:      utils.GetFuncName(v),
-			Migrate: v,
+			ID:      utils.GetFuncName(m),
+			Migrate: m,
 		})
 	}
 	gm := gormigrate.New(db, &gormigrate.Options{

@@ -5,21 +5,23 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
-// t := time.Now()
-// log.Println("current time:", t.Format(timeLayout))
 const (
 	// 2006-01-02T15:04:05.999999999Z07:00
 	timeLayout = time.RFC3339Nano
 )
 
-// DecodeCursor will decode cursor from user for mysql
+// string (timeLayout) -> time.Time
 func DecodeCursor(encodedTime string) (t time.Time, err error) {
+	now := time.Now()
+	log.Printf("current time: %v", now.Format(timeLayout))
+
 	if encodedTime == "" {
 		t = time.Now()
-		log.Print("t: ", t)
-		return t, nil
+		log.Printf("t: %v", t)
+		return
 	}
 
 	timeByte, err := base64.StdEncoding.DecodeString(encodedTime)
@@ -32,8 +34,13 @@ func DecodeCursor(encodedTime string) (t time.Time, err error) {
 	return
 }
 
-// EncodeCursor will encode cursor from mysql to user
+// time.Time -> string (timeLayout)
 func EncodeCursor(t time.Time) string {
 	timeString := t.Format(timeLayout)
 	return base64.StdEncoding.EncodeToString([]byte(timeString))
+}
+
+func NewValidator() *validator.Validate {
+	v := validator.New()
+	return v
 }

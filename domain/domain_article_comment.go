@@ -8,12 +8,12 @@ import (
 )
 
 type ArticleComment struct {
-	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" validate:"required" json:"id"`
+	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
 	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
-	ArticleID uuid.UUID `gorm:"type:char(36);not null" validate:"required" json:"articleId"`
-	Body      string    `gorm:"type:text" json:"body"`
-	Rate      int       `json:"rate"`
+	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"articleId"`
+	Body      string    `gorm:"type:text" validate:"required" json:"body"`
+	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5
 }
 
 type ArticleCommentUsecase interface {

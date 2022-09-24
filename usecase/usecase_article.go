@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"golang.org/x/sync/errgroup"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 )
@@ -85,7 +85,9 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 
 	// aosList <- chArticleOwners
 	for aos := range chArticleOwners {
-		aosList[aos[0].ArticleID] = aos
+		if len(aos) > 0 {
+			aosList[aos[0].ArticleID] = aos
+		}
 	}
 
 	// ars[i].ArticleOwners <- aosList
@@ -93,7 +95,7 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 		aos, ok := aosList[ar.ID]
 		ars[i].ArticleOwners = aos
 		if !ok {
-			log.Printf("warning: aosList[%d] is invalid", ar.ID)
+			log.Warn().Msgf("aosList[%d] is invalid", ar.ID)
 		}
 	}
 
@@ -153,6 +155,36 @@ func (au *articleUsecase) fillArticleDetail(c context.Context, ar domain.Article
 	}
 	return ar, nil
 }
+
+func fillArticleIDs(ar *domain.Article) (*domain.Article, error) {
+	aid := uuid.New()
+	ar.ID = aid
+
+	uid := uuid.New()
+	ar.UserID = uid
+	ar.User.ID = uid
+
+	ar.ArticleGameContent.ID = aid
+
+	for _, ao := range ar.ArticleOwners {
+		ao.ID = uuid.New()
+		ao.ArticleID = aid
+	}
+	for _, at := range ar.ArticleTags {
+		at.ID = uuid.New()
+		at.ArticleID = aid
+	}
+	for _, ac := range ar.ArticleComments {
+		ac.ID = uuid.New()
+		ac.ArticleID = aid
+	}
+	for _, aiu := range ar.ArticleImageURLs {
+		aiu.ID = uuid.New()
+		aiu.ArticleID = aid
+	}
+	return ar, nil
+}
+
 func (au *articleUsecase) GetByID(c context.Context, id uuid.UUID) (ar domain.Article, err error) {
 	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
@@ -190,7 +222,16 @@ func (au *articleUsecase) GetByTitle(c context.Context, title string) (ar domain
 func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err error) {
 	ctx, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
-	if _, err = au.GetByTitle(ctx, ar.Title); err != nil {
+
+	// Check for title conflicts
+	_, err = au.GetByTitle(ctx, ar.Title)
+	if err == nil {
+		return domain.ErrConflict
+	} else if err != domain.ErrNotFound {
+		return err
+	}
+	ar, err = fillArticleIDs(ar)
+	if err != nil {
 		return err
 	}
 	return au.ar.Insert(ar)
@@ -199,6 +240,7 @@ func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err err
 func (au *articleUsecase) Delete(c context.Context, id uuid.UUID) (err error) {
 	_, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
+
 	if _, err = au.ar.GetByID(id); err != nil {
 		return err
 	}
