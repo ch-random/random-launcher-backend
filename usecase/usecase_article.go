@@ -158,28 +158,38 @@ func (au *articleUsecase) fillArticleDetail(c context.Context, ar domain.Article
 
 func fillArticleIDs(ar *domain.Article) (*domain.Article, error) {
 	aid := uuid.New()
+	log.Printf("aid: %v", aid)
 	ar.ID = aid
 
 	uid := uuid.New()
+	log.Printf("uid: %v", uid)
 	ar.UserID = uid
 	ar.User.ID = uid
 
 	ar.ArticleGameContent.ID = aid
 
-	for _, ao := range ar.ArticleOwners {
-		ao.ID = uuid.New()
+	for i, ao := range ar.ArticleOwners {
+		aoid := uuid.New()
+		log.Printf("i, aoid: %v, %v", i, aoid)
+		ao.ID = aoid
 		ao.ArticleID = aid
 	}
-	for _, at := range ar.ArticleTags {
-		at.ID = uuid.New()
+	for i, at := range ar.ArticleTags {
+		atid := uuid.New()
+		log.Printf("i, atid: %v, %v", i, atid)
+		at.ID = atid
 		at.ArticleID = aid
 	}
-	for _, ac := range ar.ArticleComments {
-		ac.ID = uuid.New()
+	for i, ac := range ar.ArticleComments {
+		acid := uuid.New()
+		log.Printf("i, acid: %v, %v", i, acid)
+		ac.ID = acid
 		ac.ArticleID = aid
 	}
-	for _, aiu := range ar.ArticleImageURLs {
-		aiu.ID = uuid.New()
+	for i, aiu := range ar.ArticleImageURLs {
+		aiuid := uuid.New()
+		log.Printf("i, aiuid: %v, %v", i, aiuid)
+		aiu.ID = aiuid
 		aiu.ArticleID = aid
 	}
 	return ar, nil

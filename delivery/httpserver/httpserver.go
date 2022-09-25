@@ -32,6 +32,9 @@ func NewHandler() *echo.Echo {
 
 	h := &HTTPHandler{ArticleUsecase: newArticleUsecase()}
 
+	// /
+	e.GET("/", h.Index)
+
 	// /articles
 	e.GET("/articles", h.FetchArticles)
 	e.POST("/articles", h.InsertArticle)
@@ -49,6 +52,11 @@ func NewHandler() *echo.Echo {
 	e.GET("/comments/article/:id", h.GetArticleCommentsByArticleID)
 	e.DELETE("/comments/article/:id", h.DeleteCommentByArticleID)
 	return e
+}
+
+func (h *HTTPHandler) Index(c echo.Context) (err error) {
+	err = domain.ErrNotFound
+	return c.JSON(getStatusCode(err), getResponseError(err))
 }
 
 func newArticleUsecase() domain.ArticleUsecase {
