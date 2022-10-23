@@ -6,7 +6,7 @@ import (
 
 type ArticleTag struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"articleId"`
+	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
 }
 

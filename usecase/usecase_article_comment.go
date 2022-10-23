@@ -10,34 +10,16 @@ import (
 )
 
 type articleCommentUsecase struct {
-	ur      domain.UserRepository
-	ar      domain.ArticleRepository
-	agcr    domain.ArticleGameContentRepository
-	aor     domain.ArticleOwnerRepository
-	atr     domain.ArticleTagRepository
 	acr     domain.ArticleCommentRepository
-	aiur    domain.ArticleImageURLRepository
 	timeout time.Duration
 }
 
-func NewCommentUsecase(
-	ur domain.UserRepository,
-	ar domain.ArticleRepository,
-	agcr domain.ArticleGameContentRepository,
-	aor domain.ArticleOwnerRepository,
-	atr domain.ArticleTagRepository,
+func NewArticleCommentUsecase(
 	acr domain.ArticleCommentRepository,
-	aiur domain.ArticleImageURLRepository,
 	timeout time.Duration,
 ) domain.ArticleCommentUsecase {
 	return &articleCommentUsecase{
-		ur,
-		ar,
-		agcr,
-		aor,
-		atr,
 		acr,
-		aiur,
 		timeout,
 	}
 }
@@ -86,8 +68,12 @@ func (acu *articleCommentUsecase) Delete(c context.Context, id uuid.UUID) (err e
 	_, cancel := context.WithTimeout(c, acu.timeout)
 	defer cancel()
 
-	if _, err = acu.acr.GetByID(id); err != nil {
-		return err
-	}
 	return acu.acr.Delete(id)
+}
+
+func (acu *articleCommentUsecase) DeleteByArticleID(c context.Context, id uuid.UUID) (err error) {
+	_, cancel := context.WithTimeout(c, acu.timeout)
+	defer cancel()
+
+	return acu.acr.DeleteByArticleID(id)
 }

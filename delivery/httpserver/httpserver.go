@@ -18,8 +18,8 @@ type ResponseError struct {
 	Message string `json:"message"`
 	Version string `json:"version"`
 }
-
-type HTTPHandler struct {
+type httpHandler struct {
+	UserUsecase           domain.UserUsecase
 	ArticleUsecase        domain.ArticleUsecase
 	ArticleCommentUsecase domain.ArticleCommentUsecase
 }
@@ -30,36 +30,6 @@ func NewHandler() *echo.Echo {
 	corsHandler := cors.NewCORSHandler()
 	e.Use(corsHandler.HandleCORS)
 
-	h := &HTTPHandler{ArticleUsecase: newArticleUsecase()}
-
-	// /
-	e.GET("/", h.Index)
-
-	// /articles
-	e.GET("/articles", h.FetchArticles)
-	e.POST("/articles", h.InsertArticle)
-	// /articles/:id
-	e.GET("/articles/:id", h.GetArticleByID)
-	e.PUT("/articles/:id", h.UpdateArticle)
-	e.DELETE("/articles/:id", h.DeleteArticle)
-
-	// /comments
-	e.POST("/comments", h.InsertArticleComment)
-	// /comments/:id
-	e.PUT("/comments/:id", h.UpdateArticleComment)
-	e.DELETE("/comments/:id", h.DeleteeArticleCommentByID)
-	// /comments/article/:id
-	e.GET("/comments/article/:id", h.GetArticleCommentsByArticleID)
-	e.DELETE("/comments/article/:id", h.DeleteCommentByArticleID)
-	return e
-}
-
-func (h *HTTPHandler) Index(c echo.Context) (err error) {
-	err = domain.ErrNotFound
-	return c.JSON(getStatusCode(err), getResponseError(err))
-}
-
-func newArticleUsecase() domain.ArticleUsecase {
 	db, err := pscale.GetDB()
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to connect to PlanetScale")
@@ -73,17 +43,42 @@ func newArticleUsecase() domain.ArticleUsecase {
 	acr := pscale.NewArticleCommentRepository(db)
 	aiur := pscale.NewArticleImageURLRepository(db)
 	timeout := configs.Timeout
-	au := usecase.NewArticleUsecase(
-		ur,
-		ar,
-		agc,
-		aor,
-		atr,
-		acr,
-		aiur,
-		timeout,
-	)
-	return au
+	h := &httpHandler{
+		UserUsecase: usecase.NewUserUsecase(ur, timeout),
+		ArticleUsecase: usecase.NewArticleUsecase(ur, ar, agc, aor, atr, acr, aiur, timeout),
+		ArticleCommentUsecase: usecase.NewArticleCommentUsecase(acr, timeout),
+	}
+
+	// /
+	e.GET("/", h.Index)
+
+	// /users
+	e.GET("/users", h.FetchUsers)
+	// /users/:id
+	e.PUT("/users/:id", h.UpdateUser)
+
+	// /articles
+	e.GET("/articles", h.FetchArticles)
+	e.POST("/articles", h.InsertArticle)
+	// /articles/:id
+	e.GET("/articles/:id", h.GetArticleByID)
+	e.PUT("/articles/:id", h.UpdateArticle)
+	e.DELETE("/articles/:id", h.DeleteArticle)
+
+	// /comments
+	e.POST("/comments", h.InsertArticleComment)
+	// /comments/:id
+	e.PUT("/comments/:id", h.UpdateArticleComment)
+	e.DELETE("/comments/:id", h.DeleteArticleCommentByID)
+	// /comments/article/:id
+	e.GET("/comments/article/:id", h.GetArticleCommentsByArticleID)
+	e.DELETE("/comments/article/:id", h.DeleteCommentByArticleID)
+	return e
+}
+
+func (h *httpHandler) Index(c echo.Context) (err error) {
+	err = domain.ErrNotFound
+	return c.JSON(getStatusCode(err), getResponseError(err))
 }
 
 func getResponseError(err error) ResponseError {

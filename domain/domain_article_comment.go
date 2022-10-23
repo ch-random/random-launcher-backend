@@ -9,9 +9,9 @@ import (
 
 type ArticleComment struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
-	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"articleId"`
+	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5
 }
@@ -22,6 +22,7 @@ type ArticleCommentUsecase interface {
 	Insert(c context.Context, ac *ArticleComment) error
 	Update(c context.Context, ac *ArticleComment) error
 	Delete(c context.Context, id uuid.UUID) error
+	DeleteByArticleID(c context.Context, id uuid.UUID) error
 }
 type ArticleCommentRepository interface {
 	GetByID(id uuid.UUID) (ArticleComment, error)
@@ -29,4 +30,5 @@ type ArticleCommentRepository interface {
 	Insert(ac *ArticleComment) error
 	Update(ac *ArticleComment) error
 	Delete(id uuid.UUID) error
+	DeleteByArticleID(id uuid.UUID) error
 }

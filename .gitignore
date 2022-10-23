@@ -1,6 +1,6 @@
 /.vscode
 /middleware/jwt
-/vendor
+/venv
 
 *.Identifier
 *.py

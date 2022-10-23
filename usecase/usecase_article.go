@@ -168,29 +168,38 @@ func fillArticleIDs(ar *domain.Article) (*domain.Article, error) {
 
 	ar.ArticleGameContent.ID = aid
 
+	// uuid.Nil: 00000000-0000-0000-0000-000000000000
 	for i, ao := range ar.ArticleOwners {
-		aoid := uuid.New()
-		log.Printf("i, aoid: %v, %v", i, aoid)
-		ao.ID = aoid
-		ao.ArticleID = aid
+		if ao.ID == uuid.Nil {
+			aoid := uuid.New()
+			log.Printf("i, aoid: %v, %v", i, aoid)
+			ar.ArticleOwners[i].ID = aoid
+		}
+		ar.ArticleOwners[i].ArticleID = aid
 	}
 	for i, at := range ar.ArticleTags {
-		atid := uuid.New()
-		log.Printf("i, atid: %v, %v", i, atid)
-		at.ID = atid
-		at.ArticleID = aid
+		if at.ID == uuid.Nil {
+			atid := uuid.New()
+			log.Printf("i, atid: %v, %v", i, atid)
+			ar.ArticleTags[i].ID = atid
+		}
+		ar.ArticleTags[i].ArticleID = aid
 	}
 	for i, ac := range ar.ArticleComments {
-		acid := uuid.New()
-		log.Printf("i, acid: %v, %v", i, acid)
-		ac.ID = acid
-		ac.ArticleID = aid
+		if ac.ID == uuid.Nil {
+			acid := uuid.New()
+			log.Printf("i, acid: %v, %v", i, acid)
+			ar.ArticleComments[i].ID = acid
+		}
+		ar.ArticleComments[i].ArticleID = aid
 	}
 	for i, aiu := range ar.ArticleImageURLs {
-		aiuid := uuid.New()
-		log.Printf("i, aiuid: %v, %v", i, aiuid)
-		aiu.ID = aiuid
-		aiu.ArticleID = aid
+		if aiu.ID == uuid.Nil {
+			aiuid := uuid.New()
+			log.Printf("i, aiuid: %v, %v", i, aiuid)
+			ar.ArticleImageURLs[i].ID = aiuid
+		}
+		ar.ArticleImageURLs[i].ArticleID = aid
 	}
 	return ar, nil
 }
@@ -244,6 +253,8 @@ func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err err
 	if err != nil {
 		return err
 	}
+	// au.ur.Update()
+	log.Printf("ar: %v", ar)
 	return au.ar.Insert(ar)
 }
 
@@ -251,8 +262,5 @@ func (au *articleUsecase) Delete(c context.Context, id uuid.UUID) (err error) {
 	_, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
 
-	if _, err = au.ar.GetByID(id); err != nil {
-		return err
-	}
 	return au.ar.Delete(id)
 }

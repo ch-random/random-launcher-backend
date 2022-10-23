@@ -21,7 +21,7 @@ func articleValid(ar *domain.Article) (bool, error) {
 	return true, nil
 }
 
-func (h *HTTPHandler) FetchArticles(c echo.Context) error {
+func (h *httpHandler) FetchArticles(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
 	numString := c.QueryParam("num")
 	ctx := c.Request().Context()
@@ -33,7 +33,7 @@ func (h *HTTPHandler) FetchArticles(c echo.Context) error {
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, ars)
 }
-func (h *HTTPHandler) InsertArticle(c echo.Context) error {
+func (h *httpHandler) InsertArticle(c echo.Context) error {
 	var ar domain.Article
 	if err := c.Bind(&ar); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, getResponseError(err))
@@ -50,7 +50,7 @@ func (h *HTTPHandler) InsertArticle(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ar)
 }
 
-func (h *HTTPHandler) GetArticleByID(c echo.Context) error {
+func (h *httpHandler) GetArticleByID(c echo.Context) error {
 	idString := c.Param("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
@@ -64,28 +64,31 @@ func (h *HTTPHandler) GetArticleByID(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, ar)
 }
-func (h *HTTPHandler) UpdateArticle(c echo.Context) error {
-	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
-	// idString := c.Param("id")
-	// id, err := uuid.Parse(idString)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, getResponseError(domain.ErrBadParamInput))
-	// }
-
+func (h *httpHandler) UpdateArticle(c echo.Context) error {
 	var ar domain.Article
 	if err := c.Bind(&ar); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, getResponseError(domain.ErrBadRequestBodyInput))
 	}
-	// ar.ID = id
+
+	// verify
+	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
+	idString := c.Param("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, getResponseError(domain.ErrBadParamInput))
+	}
+	if ar.ID != id {
+		return c.JSON(http.StatusBadRequest, getResponseError(domain.ErrBadParamInput))
+	}
 
 	ctx := c.Request().Context()
-	err := h.ArticleUsecase.Update(ctx, &ar)
+	err = h.ArticleUsecase.Update(ctx, &ar)
 	if err != nil {
 		return c.JSON(getStatusCode(err), getResponseError(err))
 	}
 	return c.JSON(http.StatusOK, ar)
 }
-func (h *HTTPHandler) DeleteArticle(c echo.Context) error {
+func (h *httpHandler) DeleteArticle(c echo.Context) error {
 	idString := c.Param("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {

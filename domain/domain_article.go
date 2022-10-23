@@ -20,22 +20,22 @@ type Article struct {
 	// https://stackoverflow.com/questions/66810464/unsupported-relations-in-gorm
 	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
 	// `param:"id"`: c.Param("id")
-	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"Id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
+	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"id"`
+	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
 	Title     string    `gorm:"type:text" validate:"required" json:"title"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Public    bool      `gorm:"type:boolean" validate:"required" json:"public"`
 	// belongs to
-	UserID uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
-	User   User      `json:"user"`
+	UserID uuid.UUID `gorm:"type:char(36);not null" json:"user_id"`
+	User   User      `gorm:"PRELOAD:false" json:"user"`
 	// has one
-	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"articleGameContents"`
+	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"article_game_contents"`
 	// has many
-	ArticleOwners    []ArticleOwner    `json:"articleOwners,omitempty"`
-	ArticleTags      []ArticleTag      `json:"articleTags,omitempty"`
-	ArticleComments  []ArticleComment  `json:"articleComments,omitempty"`
-	ArticleImageURLs []ArticleImageURL `json:"articleImageUrls,omitempty"`
+	ArticleOwners    []ArticleOwner    `json:"article_owners,omitempty"`
+	ArticleTags      []ArticleTag      `json:"article_tags,omitempty"`
+	ArticleComments  []ArticleComment  `json:"article_comments,omitempty"`
+	ArticleImageURLs []ArticleImageURL `json:"article_image_urls,omitempty"`
 }
 
 type ArticleUsecase interface {

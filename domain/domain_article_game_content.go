@@ -9,10 +9,10 @@ import (
 type ArticleGameContent struct {
 	// ArticleID
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updatedAt"`
-	ExecPath  string    `gorm:"type:text" validate:"required" json:"execPath"`
-	ZipURL    string    `gorm:"type:text" validate:"required" json:"zipUrl"`
+	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	ExecPath  string    `gorm:"type:text" validate:"required" json:"exec_path"`
+	ZipURL    string    `gorm:"type:text" validate:"required" json:"zip_url"`
 }
 
 type ArticleGameContentRepository interface {

@@ -7,9 +7,10 @@ import (
 type ArticleOwner struct {
 	// UserID
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"articleId"`
+	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	// has one
-	User User `gorm:"foreignKey:ID" json:"-"`
+	// User User `gorm:"foreignKey:ID" json:"-"`
+	User User `gorm:"foreignKey:ID" json:"user"`
 }
 
 type ArticleOwnerRepository interface {

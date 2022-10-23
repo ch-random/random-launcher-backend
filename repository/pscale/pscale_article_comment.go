@@ -66,3 +66,11 @@ func (acr *pscaleArticleCommentRepository) Delete(id uuid.UUID) (err error) {
 	}
 	return
 }
+
+func (acr *pscaleArticleCommentRepository) DeleteByArticleID(id uuid.UUID) (err error) {
+	db := acr.db.Where("article_id = ?", id).Delete(&domain.ArticleComment{});
+	if err = db.Error; err != nil {
+		return
+	}
+	return
+}

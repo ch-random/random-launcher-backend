@@ -58,6 +58,7 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 	}
 	return
 }
+
 func (articleRepo *pscaleArticleRepository) GetByID(id uuid.UUID) (ar domain.Article, err error) {
 	db := articleRepo.db.Where("id = ?", id).Preload(clause.Associations).Begin().First(&ar)
 	if db.Error != nil {
