@@ -5,6 +5,8 @@
 *.Identifier
 *.py
 *.sh
+*.md
+
 .env
 dbdiagram.md
 go.sum

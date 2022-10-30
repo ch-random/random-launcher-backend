@@ -30,7 +30,7 @@ type Article struct {
 	UserID uuid.UUID `gorm:"type:char(36);not null" json:"user_id"`
 	User   User      `gorm:"PRELOAD:false" json:"user"`
 	// has one
-	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"article_game_contents"`
+	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"article_game_content"`
 	// has many
 	ArticleOwners    []ArticleOwner    `json:"article_owners,omitempty"`
 	ArticleTags      []ArticleTag      `json:"article_tags,omitempty"`

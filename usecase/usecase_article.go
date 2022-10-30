@@ -156,7 +156,7 @@ func (au *articleUsecase) fillArticleDetail(c context.Context, ar domain.Article
 	return ar, nil
 }
 
-func fillArticleIDs(ar *domain.Article) (*domain.Article, error) {
+func fillNewArticleIDs(ar *domain.Article) (*domain.Article, error) {
 	aid := uuid.New()
 	log.Printf("aid: %v", aid)
 	ar.ID = aid
@@ -249,7 +249,7 @@ func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err err
 	} else if err != domain.ErrNotFound {
 		return err
 	}
-	ar, err = fillArticleIDs(ar)
+	ar, err = fillNewArticleIDs(ar)
 	if err != nil {
 		return err
 	}

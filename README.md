@@ -4,10 +4,36 @@
 
 # random-launcher-backend
 
+## Install `fly`
+
+```sh
+curl -L https://fly.io/install.sh | sh
+```
+
+## Login
+
+```sh
+fly auth login
+fly logs -a random-launcher
+```
+
 ## Execute
 
 ```sh
 go run cmd/app/main.go
+```
+
+## Initialize all tables
+
+```sh
+go run cmd/app/main.go migrate --drop
+```
+
+## Deploy
+
+```sh
+# fly wireguard reset
+fly deploy
 ```
 
 ## License

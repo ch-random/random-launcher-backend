@@ -7,16 +7,16 @@ import (
 	"github.com/labstack/echo"
 
 	"github.com/ch-random/random-launcher-backend/domain"
-	"github.com/ch-random/random-launcher-backend/repository"
+	// "github.com/ch-random/random-launcher-backend/repository"
 )
 
-func userValid(u *domain.User) (bool, error) {
-	v := repository.NewValidator()
-	if err := v.Struct(u); err != nil {
-		return false, err
-	}
-	return true, nil
-}
+// func userValid(u *domain.User) (bool, error) {
+// 	v := repository.NewValidator()
+// 	if err := v.Struct(u); err != nil {
+// 		return false, err
+// 	}
+// 	return true, nil
+// }
 
 func (h *httpHandler) FetchUsers(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
