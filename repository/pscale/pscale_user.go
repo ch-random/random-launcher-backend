@@ -17,7 +17,8 @@ type pscaleUserRepository struct {
 }
 
 func NewUserRepository(db *gorm.DB) domain.UserRepository {
-	return &pscaleUserRepository{db.Model(&domain.User{})}
+	// return &pscaleUserRepository{db.Model(&domain.User{})}
+	return &pscaleUserRepository{db}
 }
 
 func (userRepo *pscaleUserRepository) Fetch(cursor string, numString string) (us []domain.User, nextCursor string, err error) {
@@ -64,6 +65,15 @@ func (userRepo *pscaleUserRepository) GetByID(id uuid.UUID) (user domain.User, e
 	// return userRepo.getOne(ctx, query, id)
 	if db := userRepo.db.Where("id = ?", id).First(&user); db.Error != nil {
 		err = domain.ErrNotFound
+	}
+	return
+}
+
+func (userRepo *pscaleUserRepository) Insert(u *domain.User) (err error) {
+	db := userRepo.db.Create(u)
+	if err = db.Error; err != nil {
+		db.Rollback()
+		return
 	}
 	return
 }

@@ -169,14 +169,14 @@ func fillNewArticleIDs(ar *domain.Article) (*domain.Article, error) {
 	ar.ArticleGameContent.ID = aid
 
 	// uuid.Nil: 00000000-0000-0000-0000-000000000000
-	for i, ao := range ar.ArticleOwners {
-		if ao.ID == uuid.Nil {
-			aoid := uuid.New()
-			log.Printf("i, aoid: %v, %v", i, aoid)
-			ar.ArticleOwners[i].ID = aoid
-		}
-		ar.ArticleOwners[i].ArticleID = aid
-	}
+	// for i, ao := range ar.ArticleOwners {
+	// 	if ao.ID == uuid.Nil {
+	// 		aoid := uuid.New()
+	// 		log.Printf("i, aoid: %v, %v", i, aoid)
+	// 		ar.ArticleOwners[i].ID = aoid
+	// 	}
+	// 	ar.ArticleOwners[i].ArticleID = aid
+	// }
 	for i, at := range ar.ArticleTags {
 		if at.ID == uuid.Nil {
 			atid := uuid.New()
@@ -249,6 +249,7 @@ func (au *articleUsecase) Insert(c context.Context, ar *domain.Article) (err err
 	} else if err != domain.ErrNotFound {
 		return err
 	}
+
 	ar, err = fillNewArticleIDs(ar)
 	if err != nil {
 		return err

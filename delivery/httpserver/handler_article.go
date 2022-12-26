@@ -10,16 +10,7 @@ import (
 	"github.com/labstack/echo"
 
 	"github.com/ch-random/random-launcher-backend/domain"
-	"github.com/ch-random/random-launcher-backend/repository"
 )
-
-func articleValid(ar *domain.Article) (bool, error) {
-	v := repository.NewValidator()
-	if err := v.Struct(ar); err != nil {
-		return false, err
-	}
-	return true, nil
-}
 
 func (h *httpHandler) FetchArticles(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
@@ -39,7 +30,7 @@ func (h *httpHandler) InsertArticle(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, getResponseError(err))
 	}
 
-	if ok, err := articleValid(&ar); !ok {
+	if ok, err := valid(&ar); !ok {
 		return c.JSON(http.StatusBadRequest, getResponseError(err))
 	}
 

@@ -32,10 +32,10 @@ type Article struct {
 	// has one
 	ArticleGameContent ArticleGameContent `gorm:"foreignKey:ID" json:"article_game_content"`
 	// has many
-	ArticleOwners    []ArticleOwner    `json:"article_owners,omitempty"`
-	ArticleTags      []ArticleTag      `json:"article_tags,omitempty"`
-	ArticleComments  []ArticleComment  `json:"article_comments,omitempty"`
-	ArticleImageURLs []ArticleImageURL `json:"article_image_urls,omitempty"`
+	ArticleOwners    []ArticleOwner    `json:"article_owners"`
+	ArticleTags      []ArticleTag      `json:"article_tags"`
+	ArticleComments  []ArticleComment  `json:"article_comments"`
+	ArticleImageURLs []ArticleImageURL `json:"article_image_urls"`
 }
 
 type ArticleUsecase interface {

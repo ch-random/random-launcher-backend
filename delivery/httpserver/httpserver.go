@@ -10,6 +10,7 @@ import (
 	"github.com/ch-random/random-launcher-backend/domain"
 	"github.com/ch-random/random-launcher-backend/middleware/cors"
 	"github.com/ch-random/random-launcher-backend/migration"
+	"github.com/ch-random/random-launcher-backend/repository"
 	"github.com/ch-random/random-launcher-backend/repository/pscale"
 	"github.com/ch-random/random-launcher-backend/usecase"
 )
@@ -54,6 +55,7 @@ func NewHandler() *echo.Echo {
 
 	// /users
 	e.GET("/users", h.FetchUsers)
+	e.POST("/users", h.InsertUser)
 	// /users/:id
 	e.PUT("/users/:id", h.UpdateUser)
 
@@ -74,6 +76,14 @@ func NewHandler() *echo.Echo {
 	e.GET("/comments/article/:id", h.GetArticleCommentsByArticleID)
 	e.DELETE("/comments/article/:id", h.DeleteCommentByArticleID)
 	return e
+}
+
+func valid(u interface{}) (bool, error) {
+	v := repository.NewValidator()
+	if err := v.Struct(u); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (h *httpHandler) Index(c echo.Context) (err error) {

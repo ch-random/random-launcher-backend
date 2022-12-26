@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 )
@@ -33,6 +34,35 @@ func (uu *userUsecase) Fetch(c context.Context, cursor string, numString string)
 		return nil, "", err
 	}
 	return
+}
+
+func fillNewUserDetails(u *domain.User) (*domain.User, error) {
+	uid := uuid.New()
+	log.Printf("uid: %v", uid)
+	u.ID = uid
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+	return u, nil
+}
+func (uu *userUsecase) Insert(c context.Context, u *domain.User) (err error) {
+	ctx, cancel := context.WithTimeout(c, uu.timeout)
+	defer cancel()
+
+	// Check for id conflicts
+	_, err = uu.GetByID(ctx, u.ID)
+	log.Printf("uu.go %v", err)
+	if err == nil {
+		return domain.ErrConflict
+	} else if err != domain.ErrNotFound {
+		return err
+	}
+
+	u, err = fillNewUserDetails(u)
+	if err != nil {
+		return err
+	}
+	log.Printf("u: %v", u)
+	return uu.ur.Insert(u)
 }
 
 func (uu *userUsecase) GetByID(c context.Context, id uuid.UUID) (u domain.User, err error) {

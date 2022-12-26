@@ -21,10 +21,12 @@ type User struct {
 type UserUsecase interface {
 	Fetch(c context.Context, cursor string, numString string) ([]User, string, error)
 	GetByID(c context.Context, id uuid.UUID) (User, error)
+	Insert(c context.Context, u *User) error
 	Update(c context.Context, u *User) error
 }
 type UserRepository interface {
 	Fetch(cursor string, numString string) ([]User, string, error)
 	GetByID(id uuid.UUID) (User, error)
+	Insert(u *User) error
 	Update(u *User) error
 }
