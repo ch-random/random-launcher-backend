@@ -4,20 +4,19 @@
 
 # random-launcher-backend
 
-## Install `fly`
+## render の設定に関して
 
-```sh
-curl -L https://fly.io/install.sh | sh
+Build Command には
+
+```
+go build -ldflags "-s -w" -o main ./cmd/app
 ```
 
-## Login
-
-```sh
-fly auth login
-fly logs -a random-launcher
-```
+と書きます。
 
 ## Execute
+
+以下を実行後、<http://localhost:8080/users>, <http://localhost:8080/articles> を見に行ってね。
 
 ```sh
 go run cmd/app/main.go
@@ -27,13 +26,6 @@ go run cmd/app/main.go
 
 ```sh
 go run cmd/app/main.go migrate --drop
-```
-
-## Deploy
-
-```sh
-# fly wireguard reset
-fly deploy
 ```
 
 ## License

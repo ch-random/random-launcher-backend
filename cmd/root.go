@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/ch-random/random-launcher-backend/configs"
+	"github.com/ch-random/random-launcher-backend/config"
 	"github.com/ch-random/random-launcher-backend/delivery/httpserver"
 )
 
@@ -38,7 +38,7 @@ func rootRunE(cmd *cobra.Command, args []string) (err error) {
 
 	e := httpserver.NewHandler()
 
-	port := getEnvOrDefault("PORT", configs.Port)
+	port := getEnvOrDefault("PORT", config.Port)
 	log.Info().Msgf("listening on %s", port)
 	addr := ":" + port
 	if err := e.Start(addr); err != nil {

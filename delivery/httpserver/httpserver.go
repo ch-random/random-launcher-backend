@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog/log"
 
-	"github.com/ch-random/random-launcher-backend/configs"
+	"github.com/ch-random/random-launcher-backend/config"
 	"github.com/ch-random/random-launcher-backend/domain"
 	"github.com/ch-random/random-launcher-backend/middleware/cors"
 	"github.com/ch-random/random-launcher-backend/migration"
@@ -43,7 +43,7 @@ func NewHandler() *echo.Echo {
 	atr := pscale.NewArticleTagRepository(db)
 	acr := pscale.NewArticleCommentRepository(db)
 	aiur := pscale.NewArticleImageURLRepository(db)
-	timeout := configs.Timeout
+	timeout := config.Timeout
 	h := &httpHandler{
 		UserUsecase: usecase.NewUserUsecase(ur, timeout),
 		ArticleUsecase: usecase.NewArticleUsecase(ur, ar, agc, aor, atr, acr, aiur, timeout),
