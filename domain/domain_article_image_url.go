@@ -9,6 +9,9 @@ type ArticleImageURL struct {
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	ImageURL  string    `gorm:"type:text" validate:"required" json:"image_url"`
 }
+func (*ArticleImageURL) TableName() string {
+	return "article_image_urls"
+}
 
 type ArticleImageURLRepository interface {
 	GetByID(id uuid.UUID) (ArticleImageURL, error)

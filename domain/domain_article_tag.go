@@ -9,6 +9,9 @@ type ArticleTag struct {
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
 }
+func (*ArticleTag) TableName() string {
+	return "article_tags"
+}
 
 type ArticleTagRepository interface {
 	GetByID(id uuid.UUID) (ArticleTag, error)

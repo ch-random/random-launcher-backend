@@ -15,6 +15,9 @@ type ArticleComment struct {
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5
 }
+func (*ArticleComment) TableName() string {
+	return "article_comments"
+}
 
 type ArticleCommentUsecase interface {
 	GetByID(c context.Context, id uuid.UUID) (ArticleComment, error)

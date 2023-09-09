@@ -12,6 +12,9 @@ type ArticleOwner struct {
 	// User User `gorm:"foreignKey:ID" json:"-"`
 	User User `gorm:"foreignKey:ID" json:"user"`
 }
+func (*ArticleOwner) TableName() string {
+	return "article_owners"
+}
 
 type ArticleOwnerRepository interface {
 	GetByID(id uuid.UUID) (ArticleOwner, error)

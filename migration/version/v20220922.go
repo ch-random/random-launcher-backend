@@ -1,24 +1,20 @@
 package version
 
 import (
-	// "time"
-
-	// "github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"github.com/ch-random/random-launcher-backend/domain"
 )
 
-func V20220922(db *gorm.DB) (err error) {
-	// if err := db.AutoMigrate(&v20220922User{}); err != nil {
-	// 	return err
-	// }
-	return
+func V20220922() domain.Migration {
+	migrate := func(db *gorm.DB) (err error) {
+		return
+	}
+	rollback := func(db *gorm.DB) (err error) {
+		return
+	}
+	return domain.Migration{
+		Migrate:  migrate,
+		Rollback: rollback,
+	}
 }
-
-// type v20220922User struct {
-// 	ID        uuid.UUID `gorm:"type:char(36); primary_key" json:"id"`
-// 	// ...
-// }
-
-// func (*v20220922User) TableName() string {
-// 	return "users"
-// }

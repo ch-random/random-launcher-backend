@@ -9,20 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-// validate:"required": POST 時に必要なパラメータ
-// gorm:"not null": GET 時に必要なパラメータ
-
-// User belongs to Company (many-to-one)
-// User has one CreditCard (one-to-one)
-// User has many CreditCards (one-to-many)
-// User has and belongs to many languages (many-to-many)
+// https://stackoverflow.com/questions/66810464/unsupported-relations-in-gorm
+// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
 type Article struct {
-	// https://stackoverflow.com/questions/66810464/unsupported-relations-in-gorm
-	// https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
-	// `param:"id"`: c.Param("id")
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"id"`
 	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	EventId   string    `gorm:"type:char(36);not null" validate:"required" json:"event_id"`
 	Title     string    `gorm:"type:text" validate:"required" json:"title"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Public    bool      `gorm:"type:boolean" validate:"required" json:"public"`
@@ -36,6 +29,9 @@ type Article struct {
 	ArticleTags      []ArticleTag      `json:"article_tags"`
 	ArticleComments  []ArticleComment  `json:"article_comments"`
 	ArticleImageURLs []ArticleImageURL `json:"article_image_urls"`
+}
+func (*Article) TableName() string {
+	return "articles"
 }
 
 type ArticleUsecase interface {

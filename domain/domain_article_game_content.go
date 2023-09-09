@@ -14,6 +14,9 @@ type ArticleGameContent struct {
 	ExecPath  string    `gorm:"type:text" validate:"required" json:"exec_path"`
 	ZipURL    string    `gorm:"type:text" validate:"required" json:"zip_url"`
 }
+func (*ArticleGameContent) TableName() string {
+	return "article_game_contents"
+}
 
 type ArticleGameContentRepository interface {
 	GetByID(id uuid.UUID) (ArticleGameContent, error)
