@@ -11,17 +11,17 @@ import (
 	"github.com/ch-random/random-launcher-backend/utils"
 )
 
-const migrationTable = "migrations"
+const migrationTableName = "migrations"
 
 var (
 	migrations = []func() domain.Migration{
 		// version.VyyyyMMdd(), // change log
 		version.V20220922, // 新規作成
-		version.V20230830, // Article.EventId を追加
+		// version.V20230830, // Article.EventId を追加
 	}
 
 	GormigrateOptions = &gormigrate.Options{
-		TableName:                 migrationTable,
+		TableName:                 migrationTableName,
 		IDColumnName:              "id",
 		IDColumnSize:              128,
 		UseTransaction:            false,
@@ -58,11 +58,13 @@ func Migrate(db *gorm.DB) (inited bool, err error) {
 		})
 	}
 	gm := gormigrate.New(db, GormigrateOptions, ms)
+
 	gm.InitSchema(func(db *gorm.DB) error {
 		inited = true
 		return db.AutoMigrate(AllTables...)
 	})
-	// `Migrate` executes all migrations that did not run yet.
+
+	// `Migrate` executes all migrations that did not run yet
 	err = gm.Migrate()
 	return
 }
@@ -72,5 +74,5 @@ func DropAllTables(db *gorm.DB) error {
 	if err := m.DropTable(AllTables...); err != nil {
 		return err
 	}
-	return m.DropTable(migrationTable)
+	return m.DropTable(migrationTableName)
 }

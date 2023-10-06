@@ -33,7 +33,7 @@ func NewHandler() *echo.Echo {
 
 	db, err := pscale.GetDB()
 	if err != nil {
-		log.Warn().Err(err).Msg("failed to connect to PlanetScale")
+		panic("failed to connect to PlanetScale")
 	}
 
 	ur := pscale.NewUserRepository(db)
@@ -50,6 +50,7 @@ func NewHandler() *echo.Echo {
 		ArticleCommentUsecase: usecase.NewArticleCommentUsecase(acr, timeout),
 	}
 
+	log.Print("[httpserver] 56")
 	// /
 	e.GET("/", h.Index)
 

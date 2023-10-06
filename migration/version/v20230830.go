@@ -11,15 +11,14 @@ import (
 type v20230830ArticleNewColumn struct {
 	EventId string `gorm:"type:text" validate:"required" json:"event_id"`
 }
-
 func (*v20230830ArticleNewColumn) TableName() string {
 	return "articles"
 }
 
 type v20230830ArticleComment struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5
@@ -28,12 +27,11 @@ type v20230830ArticleComment struct {
 func (*v20230830ArticleComment) TableName() string {
 	return "article_comments"
 }
-
 type v20230830ArticleGameContent struct {
 	// ArticleID
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
 	ExecPath  string    `gorm:"type:text" validate:"required" json:"exec_path"`
 	ZipURL    string    `gorm:"type:text" validate:"required" json:"zip_url"`
 }
@@ -41,13 +39,11 @@ type v20230830ArticleGameContent struct {
 func (*v20230830ArticleGameContent) TableName() string {
 	return "article_game_contents"
 }
-
 type v20230830ArticleImageURL struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	ImageURL  string    `gorm:"type:text" validate:"required" json:"image_url"`
 }
-
 func (*v20230830ArticleImageURL) TableName() string {
 	return "article_image_urls"
 }
@@ -60,7 +56,6 @@ type v20230830ArticleOwner struct {
 	// User User `gorm:"foreignKey:ID" json:"-"`
 	User v20230830User `gorm:"foreignKey:ID" json:"user"`
 }
-
 func (*v20230830ArticleOwner) TableName() string {
 	return "article_owners"
 }
@@ -70,15 +65,14 @@ type v20230830ArticleTag struct {
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
 }
-
 func (*v20230830ArticleTag) TableName() string {
 	return "article_tags"
 }
 
 type v20230830Article struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
 	EventId   string    `gorm:"type:char(36);not null" validate:"required" json:"event_id"`
 	Title     string    `gorm:"type:text" validate:"required" json:"title"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
@@ -94,20 +88,18 @@ type v20230830Article struct {
 	ArticleComments  []v20230830ArticleComment  `json:"article_comments"`
 	ArticleImageURLs []v20230830ArticleImageURL `json:"article_image_urls"`
 }
-
 func (*v20230830Article) TableName() string {
 	return "articles"
 }
 
 type v20230830User struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:DATETIME(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:DATETIME(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
 	GoogleID  string    `gorm:"type:char(28);not null" json:"google_id"`
 	Role      string    `gorm:"type:text" validate:"required" json:"role"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
 }
-
 func (*v20230830User) TableName() string {
 	return "users"
 }

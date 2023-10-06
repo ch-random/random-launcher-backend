@@ -4,7 +4,7 @@
 
 # random-launcher-backend
 
-## render の設定に関して
+## [render](https://dashboard.render.com) の設定に関して
 
 Build Command には
 

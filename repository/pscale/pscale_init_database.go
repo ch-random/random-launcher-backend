@@ -3,9 +3,9 @@ package pscale
 import (
 	"os"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"github.com/rs/zerolog/log"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func GetDB() (db *gorm.DB, err error) {
@@ -13,11 +13,15 @@ func GetDB() (db *gorm.DB, err error) {
 	if dsn == "" {
 		log.Fatal().Msg("DSN environment variable is not set")
 	}
+	log.Printf("dsn: %v", dsn)
 
-	// Connect to PlanetScale database using DSN environment variable.
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+	// https://gorm.io/ja_JP/docs/migration.html
+	// Connect to PlanetScale database using DSN environment variable
+	// db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
+
 	if err != nil {
 		return nil, err
 	}
