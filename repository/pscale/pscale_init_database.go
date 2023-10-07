@@ -13,7 +13,6 @@ func GetDB() (db *gorm.DB, err error) {
 	if dsn == "" {
 		log.Fatal().Msg("DSN environment variable is not set")
 	}
-	log.Printf("dsn: %v", dsn)
 
 	// https://gorm.io/ja_JP/docs/migration.html
 	// Connect to PlanetScale database using DSN environment variable

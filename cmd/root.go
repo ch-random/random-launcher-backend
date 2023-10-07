@@ -10,6 +10,7 @@ import (
 
 	"github.com/ch-random/random-launcher-backend/config"
 	"github.com/ch-random/random-launcher-backend/delivery/httpserver"
+	"github.com/ch-random/random-launcher-backend/utils"
 )
 
 func rootCommand() *cobra.Command {
@@ -38,7 +39,7 @@ func rootRunE(cmd *cobra.Command, args []string) (err error) {
 
 	e := httpserver.NewHandler()
 
-	port := getEnvOrDefault("PORT", config.Port)
+	port := utils.GetEnvOrDefault("PORT", config.Port)
 	log.Info().Msgf("listening on %s", port)
 	addr := ":" + port
 	if err := e.Start(addr); err != nil {

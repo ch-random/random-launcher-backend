@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -10,4 +11,12 @@ import (
 func GetFuncName(i interface{}) string {
 	strs := strings.Split((runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()), ".")
 	return strs[len(strs)-1]
+}
+
+func GetEnvOrDefault(key string, def string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return def
+	}
+	return val
 }

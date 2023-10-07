@@ -8,7 +8,7 @@ import (
 
 	"github.com/ch-random/random-launcher-backend/config"
 	"github.com/ch-random/random-launcher-backend/domain"
-	"github.com/ch-random/random-launcher-backend/middleware/cors"
+	"github.com/ch-random/random-launcher-backend/middleware/httpheader"
 	"github.com/ch-random/random-launcher-backend/migration"
 	"github.com/ch-random/random-launcher-backend/repository"
 	"github.com/ch-random/random-launcher-backend/repository/pscale"
@@ -28,8 +28,9 @@ type httpHandler struct {
 func NewHandler() *echo.Echo {
 	e := echo.New()
 
-	corsHandler := cors.NewCORSHandler()
-	e.Use(corsHandler.HandleCORS)
+	// CORS, SUPA_ANON_KEY
+	httpHeaderHandler := httpheader.NewHTTPHeaderHandler()
+	e.Use(httpHeaderHandler.HandleHTTPHeader)
 
 	db, err := pscale.GetDB()
 	if err != nil {
@@ -50,7 +51,6 @@ func NewHandler() *echo.Echo {
 		ArticleCommentUsecase: usecase.NewArticleCommentUsecase(acr, timeout),
 	}
 
-	log.Print("[httpserver] 56")
 	// /
 	e.GET("/", h.Index)
 
