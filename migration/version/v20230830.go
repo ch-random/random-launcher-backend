@@ -17,8 +17,8 @@ func (*v20230830ArticleNewColumn) TableName() string {
 
 type v20230830ArticleComment struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5
@@ -30,8 +30,8 @@ func (*v20230830ArticleComment) TableName() string {
 type v20230830ArticleGameContent struct {
 	// ArticleID
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
 	ExecPath  string    `gorm:"type:text" validate:"required" json:"exec_path"`
 	ZipURL    string    `gorm:"type:text" validate:"required" json:"zip_url"`
 }
@@ -71,8 +71,8 @@ func (*v20230830ArticleTag) TableName() string {
 
 type v20230830Article struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
 	EventId   string    `gorm:"type:char(36);not null" validate:"required" json:"event_id"`
 	Title     string    `gorm:"type:text" validate:"required" json:"title"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
@@ -94,8 +94,8 @@ func (*v20230830Article) TableName() string {
 
 type v20230830User struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6);autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6);autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
 	GoogleID  string    `gorm:"type:char(28);not null" json:"google_id"`
 	Role      string    `gorm:"type:text" validate:"required" json:"role"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
