@@ -9,9 +9,8 @@ import (
 
 type User struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
-	GoogleID  string    `gorm:"type:char(28);not null" json:"google_id"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	Role      string    `gorm:"type:text" validate:"required" json:"role"`
 	Name      string    `gorm:"type:text" validate:"required" json:"name"`
 }

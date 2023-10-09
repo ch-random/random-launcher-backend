@@ -54,9 +54,9 @@ func (userRepo *pscaleUserRepository) Fetch(cursor string, numString string) (us
 	}
 	log.Printf("us: %v", us)
 
-	if len(us) > 0 && len(us) == num {
-		nextCursor = repository.EncodeCursor(us[len(us)-1].CreatedAt)
-	}
+	// if len(us) > 0 && len(us) == num {
+	// 	nextCursor = repository.EncodeCursor(us[len(us)-1].CreatedAt)
+	// }
 	return
 }
 

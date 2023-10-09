@@ -50,7 +50,7 @@ func (acu *articleCommentUsecase) Update(c context.Context, ac *domain.ArticleCo
 	_, cancel := context.WithTimeout(c, acu.timeout)
 	defer cancel()
 
-	ac.UpdatedAt = time.Now()
+	// ac.UpdatedAt = time.Now()
 	return acu.acr.Update(ac)
 }
 

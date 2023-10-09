@@ -40,8 +40,8 @@ func fillNewUserDetails(u *domain.User) (*domain.User, error) {
 	uid := uuid.New()
 	log.Printf("uid: %v", uid)
 	u.ID = uid
-	u.CreatedAt = time.Now()
-	u.UpdatedAt = time.Now()
+	// u.CreatedAt = time.Now()
+	// u.UpdatedAt = time.Now()
 	return u, nil
 }
 func (uu *userUsecase) Insert(c context.Context, u *domain.User) (err error) {
@@ -80,6 +80,6 @@ func (uu *userUsecase) Update(c context.Context, ac *domain.User) error {
 	_, cancel := context.WithTimeout(c, uu.timeout)
 	defer cancel()
 
-	ac.UpdatedAt = time.Now()
+	// ac.UpdatedAt = time.Now()
 	return uu.ur.Update(ac)
 }

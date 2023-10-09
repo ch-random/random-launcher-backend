@@ -9,8 +9,8 @@ import (
 
 type ArticleComment struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	ArticleID uuid.UUID `gorm:"type:char(36);not null" json:"article_id"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`
 	Rate      int       `validate:"required,gte=1,lte=5" json:"rate"` // 1-5

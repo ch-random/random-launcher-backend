@@ -221,7 +221,7 @@ func (au *articleUsecase) Update(c context.Context, ar *domain.Article) error {
 	_, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
 
-	ar.UpdatedAt = time.Now()
+	// ar.UpdatedAt = time.Now()
 	return au.ar.Update(ar)
 }
 

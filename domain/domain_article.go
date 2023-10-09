@@ -13,8 +13,8 @@ import (
 // https://zenn.dev/skanehira/articles/2020-09-19-go-echo-bind-tips
 type Article struct {
 	ID        uuid.UUID `gorm:"type:char(36);primary_key;not null" param:"id" json:"id"`
-	CreatedAt time.Time `gorm:"type:char(6)" json:"created_at"`
-	UpdatedAt time.Time `gorm:"type:char(6)" json:"updated_at"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	EventId   string    `gorm:"type:char(36);not null" validate:"required" json:"event_id"`
 	Title     string    `gorm:"type:text" validate:"required" json:"title"`
 	Body      string    `gorm:"type:text" validate:"required" json:"body"`

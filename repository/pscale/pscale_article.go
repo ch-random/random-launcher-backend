@@ -53,9 +53,9 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 	}
 	log.Printf("ars: %v", ars)
 
-	if len(ars) > 0 && len(ars) == num {
-		nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
-	}
+	// if len(ars) > 0 && len(ars) == num {
+	// 	nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
+	// }
 	return
 }
 
