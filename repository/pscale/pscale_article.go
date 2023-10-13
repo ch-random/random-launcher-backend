@@ -47,15 +47,15 @@ func (articleRepo *pscaleArticleRepository) Fetch(cursor string, numString strin
 	// Nested Preloading: db.Preload("ArticleOwner.User")
 	// db.Preload(clause.Associations) により全データを preload できる。
 	// 不要データを含むなら、db.Preload(""), `gorm:"PRELOAD:false"` として高速化。
-	db = db.Preload(clause.Associations).Begin().Find(&ars)
+	// db = db.Preload(clause.Associations).Begin().Find(&ars)
+	db = db.Preload(clause.Associations).Find(&ars)
 	if err = db.Error; err != nil {
 		return
 	}
-	log.Printf("ars: %v", ars)
 
-	// if len(ars) > 0 && len(ars) == num {
-	// 	nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
-	// }
+	if len(ars) > 0 && len(ars) == num {
+		nextCursor = repository.EncodeCursor(ars[len(ars)-1].CreatedAt)
+	}
 	return
 }
 

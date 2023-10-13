@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -67,6 +68,9 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 				return err
 			}
 			for i, ao := range aos {
+				if ao.ID == uuid.Nil {
+					return errors.New("ua.go: ao.ID == uuid.Nil")
+				}
 				aos[i].User, err = au.ur.GetByID(ao.ID)
 				if err != nil {
 					return err
@@ -106,7 +110,8 @@ func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Art
 	return ars, nil
 }
 func (au *articleUsecase) Fetch(c context.Context, cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
-	ctx, cancel := context.WithTimeout(c, au.timeout)
+	// ctx, cancel := context.WithTimeout(c, au.timeout)
+	_, cancel := context.WithTimeout(c, au.timeout)
 	defer cancel()
 
 	ars, nextCursor, err = au.ar.Fetch(cursor, numString)
@@ -114,7 +119,8 @@ func (au *articleUsecase) Fetch(c context.Context, cursor string, numString stri
 		return nil, "", err
 	}
 
-	ars, err = au.fillArticlesDetail(ctx, ars)
+	// ars, err = au.fillArticlesDetail(ctx, ars)
+	// log.Printf("ua.go ars: %v", ars)
 	if err != nil {
 		nextCursor = ""
 	}

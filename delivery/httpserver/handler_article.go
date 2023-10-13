@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
+	// "github.com/rs/zerolog/log"
 
 	"github.com/ch-random/random-launcher-backend/domain"
 )
