@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"errors"
+	// "errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -45,70 +45,70 @@ func NewArticleUsecase(
 	}
 }
 
-func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Article) ([]domain.Article, error) {
-	ctx, cancel := context.WithTimeout(c, au.timeout)
-	defer cancel()
-	eg, _ := errgroup.WithContext(ctx)
+// func (au *articleUsecase) fillArticlesDetail(c context.Context, ars []domain.Article) ([]domain.Article, error) {
+// 	ctx, cancel := context.WithTimeout(c, au.timeout)
+// 	defer cancel()
+// 	eg, _ := errgroup.WithContext(ctx)
 
-	// ars[i].ArticleOwner.User
-	// aosList <- ars
-	aosList := map[uuid.UUID][]domain.ArticleOwner{}
-	for _, ar := range ars {
-		aosList[ar.ID] = []domain.ArticleOwner{}
-	}
-	chArticleOwners := make(chan []domain.ArticleOwner)
+// 	// ars[i].ArticleOwner.User
+// 	// aosList <- ars
+// 	aosList := map[uuid.UUID][]domain.ArticleOwner{}
+// 	for _, ar := range ars {
+// 		aosList[ar.ID] = []domain.ArticleOwner{}
+// 	}
+// 	chArticleOwners := make(chan []domain.ArticleOwner)
 
-	// chArticleOwners <- aosList
-	eg.Go(func() (err error) {
-		defer close(chArticleOwners)
-		for articleID := range aosList {
-			// articleID := articleID
-			aos, err := au.aor.GetByArticleID(articleID)
-			if err != nil {
-				return err
-			}
-			for i, ao := range aos {
-				if ao.ID == uuid.Nil {
-					return errors.New("ua.go: ao.ID == uuid.Nil")
-				}
-				aos[i].User, err = au.ur.GetByID(ao.ID)
-				if err != nil {
-					return err
-				}
-			}
-			chArticleOwners <- aos
-		}
-		return
-	})
-	go func() {
-		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
-		if err := eg.Wait(); err != nil {
-			log.Err(err)
-		}
-	}()
+// 	// chArticleOwners <- aosList
+// 	eg.Go(func() (err error) {
+// 		defer close(chArticleOwners)
+// 		for articleID := range aosList {
+// 			// articleID := articleID
+// 			aos, err := au.aor.GetByArticleID(articleID)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			for i, ao := range aos {
+// 				if ao.ID == uuid.Nil {
+// 					return errors.New("ua.go: ao.ID == uuid.Nil")
+// 				}
+// 				aos[i].User, err = au.ur.GetByID(ao.ID)
+// 				if err != nil {
+// 					return err
+// 				}
+// 			}
+// 			chArticleOwners <- aos
+// 		}
+// 		return
+// 	})
+// 	go func() {
+// 		// https://pkg.go.dev/golang.org/x/sync/errgroup?utm_source=godoc#example-Group-Pipeline
+// 		if err := eg.Wait(); err != nil {
+// 			log.Err(err)
+// 		}
+// 	}()
 
-	// aosList <- chArticleOwners
-	for aos := range chArticleOwners {
-		if len(aos) > 0 {
-			aosList[aos[0].ArticleID] = aos
-		}
-	}
+// 	// aosList <- chArticleOwners
+// 	for aos := range chArticleOwners {
+// 		if len(aos) > 0 {
+// 			aosList[aos[0].ArticleID] = aos
+// 		}
+// 	}
 
-	// ars[i].ArticleOwners <- aosList
-	for i, ar := range ars {
-		aos, ok := aosList[ar.ID]
-		ars[i].ArticleOwners = aos
-		if !ok {
-			log.Warn().Msgf("aosList[%d] is invalid", ar.ID)
-		}
-	}
+// 	// ars[i].ArticleOwners <- aosList
+// 	for i, ar := range ars {
+// 		aos, ok := aosList[ar.ID]
+// 		ars[i].ArticleOwners = aos
+// 		if !ok {
+// 			log.Warn().Msgf("aosList[%d] is invalid", ar.ID)
+// 		}
+// 	}
 
-	// Check whether any of the goroutines failed
-	if err := eg.Wait(); err != nil {
-		return []domain.Article{}, nil
-	}
-	return ars, nil
-}
+// 	// Check whether any of the goroutines failed
+// 	if err := eg.Wait(); err != nil {
+// 		return []domain.Article{}, nil
+// 	}
+// 	return ars, nil
+// }
 func (au *articleUsecase) Fetch(c context.Context, cursor string, numString string) (ars []domain.Article, nextCursor string, err error) {
 	// ctx, cancel := context.WithTimeout(c, au.timeout)
 	_, cancel := context.WithTimeout(c, au.timeout)
