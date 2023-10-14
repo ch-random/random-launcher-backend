@@ -9,8 +9,8 @@ import (
 type ArticleGameContent struct {
 	// ArticleID
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey;not null" json:"id"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	ExecPath  string    `gorm:"type:text" validate:"required" json:"exec_path"`
 	ZipURL    string    `gorm:"type:text" validate:"required" json:"zip_url"`
 }
